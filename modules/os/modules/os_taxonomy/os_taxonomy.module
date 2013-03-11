@@ -71,13 +71,37 @@ function os_taxonomy_views_query_alter(&$view, &$query) {
   $alias = $query->add_table('field_data_og_vocabulary');
 
   $tid = str_replace('taxonomy/term/', '', $path);
-  $query->add_where($group_key, "$alias.og_vocabulary_target_id", $tid, '=');
+  $childs = os_taxonomy_get_children_tid($tid);
+  $query->add_where($group_key, "$alias.og_vocabulary_target_id", $childs + array($tid), 'IN');
 
   $view_title = $view->get_title();
   $term = taxonomy_term_load($tid);
   if($view_title && $term){
     $view->set_title($view_title." <span class='sub_title'>in ".t(taxonomy_term_title($term))."</span>");
   }
+}
+
+/**
+ * Return the children term IDs for a term.
+ *
+ *  @param $tid
+ *    The term ID
+ *
+ *  @return
+ *    Array of children term id.
+ */
+function os_taxonomy_get_children_tid($tid) {
+  $taxonomy_term = taxonomy_term_load($tid);
+  $tree = taxonomy_get_tree($taxonomy_term->vid);
+
+  $tids = array();
+  foreach ($tree as $term) {
+    if (in_array($tid, $term->parents)) {
+      $tids[] = $term->tid;
+    }
+  }
+
+  return $tids;
 }
 
 /**
