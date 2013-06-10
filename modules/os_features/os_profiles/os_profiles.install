@@ -1,9 +1,0 @@
-<?php 
-
-/**
- * Revert field.  Change trim length on person nodes.
- */
-function os_profiles_update_7000() {
-  features_revert(array('os_profiles' => array('field')));
-  return t('Reverted os_profiles fields.');
-}

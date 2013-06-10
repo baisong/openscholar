@@ -1,0 +1,194 @@
+<?php
+/**
+ * @file
+ *
+ * Main OpenScholar module update functions.
+ */
+
+
+function os_install() {
+  _os_date_formats();
+}
+
+/**
+ * Enable restws module
+ */
+function os_update_7001(&$sandbox) {
+  module_enable(array('restws'));
+}
+
+/**
+ * Enable the watchdog module.
+ */
+function os_update_7002() {
+  module_enable(array('dblog'));
+}
+
+/**
+ * Disable preventing anonymous cache in biblio.
+ */
+function os_update_7003() {
+  variable_set('biblio_prevent_anon_cache', FALSE);
+}
+
+/**
+ * Adds 3 new date formats
+ */
+function os_update_7004() {
+  _os_date_formats();
+}
+
+/**
+ * @function _os_date_formats()
+ *
+ * Enable the formats defined in os's date hooks
+ */
+function _os_date_formats() {
+  foreach (os_date_formats() as $fmt) {
+    $name = 'date_format_' . $fmt['type'];
+    variable_set($name, $fmt['format']);
+  }
+}
+
+/**
+ * Allow access to node/%.json to all of the users.
+ */
+function os_update_7005() {
+  //Only grant this if the module is installed
+  if (module_exists('restws')){
+    // Allow accessing resource node to all users.
+    foreach (array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID) as $rid) {
+      user_role_grant_permissions($rid, array('access resource node'));
+    }
+  }
+}
+
+/**
+ * Enable the OS WYSIWYG Link Module
+ */
+function os_update_7006() {
+  if (module_enable(array('os_wysiwyg_link'))) {
+    return t('OS Wysiwyg Link module installed.');
+  }
+
+  return t('OS Wysiwyg Link module already installed.');
+}
+
+/**
+ * Enable OS Mailchimp
+ **/
+function os_update_7007() {
+  if (module_enable(array('os_mailchimp'))) {
+    return t('OS Mailchimp module installed.');
+  }
+
+  return t('OS Mailchimp module already installed.');
+}
+
+/**
+ * Enable Elysia Cron
+ **/
+function os_update_7008() {
+  if (module_enable(array('elysia_cron'))) {
+    return t('Elysia Cron module installed.');
+  }
+
+  return t('Elysia Cron module already installed.');
+}
+
+/**
+ * Turn on the OG vocab term page access.
+ */
+function os_update_7009() {
+  variable_set('og_vocab_term_page_access', TRUE);
+}
+
+/**
+ * June 20 updates - Enable views_infinite_scroll and views_litepager modules, retire quinn theme
+ */
+function os_update_7010() {
+  module_enable(array('views_infinite_scroll', 'views_litepager'));
+  
+  //quinn and its flavors -> eloquent
+  $flavors = array(
+    'quinn_blue' => 'outsidesidebars_blue',
+    'quinn_brown' => 'outsidesidebars_brown',
+    'quinn_dark_brown' => 'outsidesidebars_darkbrown',
+    'quinn_dark_grey' => 'outsidesidebars_darkgrey',
+    'quinn_green' => 'outsidesidebars_green',
+    'quinn_khaki' => 'outsidesidebars_khaki',
+    'quinn_orange_palatino' => 'outsidesidebars_orangepalatino',
+    'quinn_sage' => 'outsidesidebars_sage',
+    'quinn_white' => 'outsidesidebars_white',
+    'theme_04_dark_grey' => 'outsidesidebars_darkgrey',
+    'theme_04_sage' => 'outsidesidebars_sage',
+    'default' => 'outsidebars_grey',
+  );
+  
+  $query = db_select('spaces_overrides', 'theme');
+  $query->join('spaces_overrides', 'flavor', 'theme.id = flavor.id');
+  
+  $query->condition('theme.object_type', 'variable');
+  $query->condition('theme.object_id', 'theme_default');
+  $query->condition('theme.value', serialize('quinn'));
+  $query->condition('flavor.object_type', 'variable');
+  $query->condition('flavor.object_id', 'os_appearance_quinn_flavor');
+  
+  $query->fields('flavor', array('id', 'value'));
+  $results = $query->execute();
+  while ($row = $results->fetchObject()) {
+    $flavor = unserialize($row->value);
+    $new_flavor = (isset($flavors[$flavor])) ? $flavors[$flavor] : $flavors['default'];
+
+    //set theme
+    $t = db_update('spaces_overrides')
+      ->fields(array('value' => serialize('eloquent')))
+      ->condition('object_type', 'variable')
+      ->condition('id', $row->id)
+      ->condition('object_id', 'theme_default')
+      ->execute();
+      
+    //set flavor
+    $flavor_set = db_update('spaces_overrides')
+      ->fields(array('value' => serialize($flavors[$flavor])))
+      ->condition('object_type', 'variable')
+      ->condition('id', $row->id)
+      ->condition('object_id', 'os_appearance_eloquent_flavor')
+      ->execute();
+    
+    if (!$flavor_set) {
+      $flavor_set = 'insert: ' . db_insert('spaces_overrides')
+        ->fields(array(
+          'type' => 'og',
+          'value' => serialize($flavors[$flavor]),
+          'object_type' => 'variable',
+          'id' => $row->id,
+          'object_id' => 'os_appearance_eloquent_flavor',
+        ))->execute(); 
+
+    }
+    print("$row->id $flavor '$t' '$flavor_set'\n");
+    
+  }
+    
+}
+
+/**
+ * Turn on Subtheme and OS subtheme modules.
+ */
+function os_update_7011() {
+  module_enable(array('subtheme', 'os_subtheme'));
+}
+
+/**
+ * Allow access to file/*.json for all users
+ */
+function os_update_7012() {
+  //Only grant this if the module is installed
+  if (module_exists('restws')){
+    // Allow accessing resource file to all users.
+    foreach (array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID) as $rid) {
+      user_role_grant_permissions($rid, array('access resource file'));
+    }
+  }
+}

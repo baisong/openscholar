@@ -6,14 +6,19 @@
 # Don't track temporary files or Mac OS system files.
 *~
 *.DS_store
+*.swp
 
 # Dont's track coder module backups
 *.coder.orig
 
 #behat
-behat/vendor
-behat/bin
-behat.local.yml
+openscholar/behat/vendor
+openscholar/behat/bin
+openscholar/behat.local.yml
 composer.phar
-composer.lock
 
+#make
+openscholar/1/
+openscholar/libraries/
+openscholar/modules/contrib/
+www/

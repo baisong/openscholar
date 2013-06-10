@@ -4,8 +4,16 @@ set -e
 # Drush executable.
 [[ $DRUSH && ${DRUSH-x} ]] || DRUSH=drush
 
+# Move to www directory.
+ROOT=$(git rev-parse --show-toplevel)
+OLD_DIR=`pwd`
+cd $ROOT
+if [ ! -d www ]; then
+  mkdir -p www/sites/default/
+fi
+
 echo "Generating sites/default/settings.php..."
-cat > ../../sites/default/settings.php <<EOF
+cat > www/sites/default/settings.php <<EOF
 <?php
 
 /**

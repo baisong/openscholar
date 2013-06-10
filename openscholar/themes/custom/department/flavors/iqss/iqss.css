@@ -1,0 +1,25 @@
+  #iqss-weekly ul {margin-left:0;}
+ #iqss-weekly ul li {list-style-type:none;}
+ #iqss-weekly h4 {margin: 1.5em 0 0.22em .1em; color:#666;}
+  #iqss-weekly h4:nth-child(1) {margin: .1em 0 0.22em .1em;}
+ #iqss-weekly-cal {display:none;}
+
+.region-content-bottom .block-boxes-os_boxes_html  h2.block-title {
+  background: url('images/eventsIcon.png') no-repeat;
+  padding-left: 42px;
+   } 
+   
+
+#block-boxes-os-news-latest .modified-in-os_news_process_node {margin-bottom:1px;clear: both;}
+
+h5 {
+	font-family: georgia,arial;
+	font-size: 18px;
+	color:#8C8179;
+	font-weight:normal;
+}
+
+h5 span {
+	color:#A51C30;
+	
+}

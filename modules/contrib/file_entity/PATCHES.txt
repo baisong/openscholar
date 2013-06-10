@@ -1,3 +1,0 @@
-Views schema type filter criteria
- -- http://drupal.org/node/1881356
- -- http://drupal.org/files/filter-by-file-schema-type-1881356-7.patch

@@ -1,0 +1,28 @@
+@media (max-width: 1008px) {
+
+#boxes-box-site_info {
+    min-height: 0;
+    padding-top: 0;
+	 margin-left: 10px;
+}
+#boxes-box-site_info h1 {
+    line-height: 35px;
+}
+#boxes-box-site_info {
+    margin-bottom: -15px;
+    padding-top: 39px !important;
+}
+#search-block-form .form-item label {
+    display: none;
+}
+}
+
+
+@media (max-width: 768px) {
+
+#search-block-form .container-inline .form-item .form-text {
+    width: 100%;
+}
+
+
+}
