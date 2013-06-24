@@ -33,7 +33,7 @@ function vsite_domain_cp_settings_domain_validate($form, $form_state) {
         ->condition('object_type', 'variable')
         ->condition('object_id', 'vsite_domain_name')
         ->condition('id', $sid, '!=')
-        ->condition('value', "%$domain%", 'LIKE')
+        ->condition('value', $domain)
         ->execute()
         ->fetchAssoc();
       // Throws form_set_error() if any are found.

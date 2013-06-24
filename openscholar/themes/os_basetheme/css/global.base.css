@@ -194,6 +194,35 @@ a, a:visited {
     color: #005C9C;
 }
 
+/* INFINITE SCROLL BUTTON */
+#autopager-load-more, #autopager-load-prev {
+     text-align: center;
+}
+
+#autopager-load-more:hover, #autopager-load-prev:hover {
+     background-color: #FFFFFF;
+}
+
+#autopager-load-prev a,
+#autopager-load-more a {
+     background: #f1f1f1;
+     border-radius: 4px 4px 4px 4px;
+     border: 1px solid #CCCCCC;
+     color: #215990;
+     display: block;
+     font-size: 13px;
+     font-weight: bold;
+     margin: 0px auto;
+     padding: 3px;
+     width: 25%;
+}
+
+#autopager-load-prev a:hover,
+#autopager-load-more a:hover {
+    text-decoration:none !important;
+    cursor: pointer;
+}
+
 em,
 dfn {
   font-style: italic;
@@ -401,6 +430,60 @@ ul ul ul ul {
     display: block;
 }
 
+.view-os-events.view-id-os_events {
+  position: relative;
+}
+
+.view-display-id-page_4 .view-content,
+.view-display-id-page_5 .view-content {
+  padding-top: 10px;
+}
+
+.view-os-events.view-id-os_events .view-header {
+  padding-top: 30px;
+}
+
+.node-event {
+  position: relative;
+}
+
+.attachment.attachment-before ul li {
+  border-bottom: none;
+}
+
+/* Don't display the ical link in the floating box. */
+#cboxWrapper .node-event .links {
+  display: none;
+}
+
+/* Commenting this out for now, until its purpose can be determined. 
+.node-event .node-content {
+  padding-top: 30px;
+}
+*/
+.view-os-events.view-id-os_events .attachment-before {
+  position: absolute;
+  top: -10px;
+  right: 0px;
+}
+
+.node-event.article .node-content .links,
+.view-os-events.view-id-os_events .attachment-before .links {
+ display:inline-block;
+ margin-left:8px;
+}
+
+.ical {
+background:url('../images/ical_icon.gif') no-repeat !important;
+padding:2px 0 2px 25px !important;
+border-bottom:none !important;
+}
+
+.rss {
+background:url('../images/rss_icon.gif') no-repeat !important;
+padding:2px 0 2px 25px !important;
+ border-bottom:none !important;
+}
 
 /* BOOK NAVS */
 .book-menu {
@@ -542,6 +625,10 @@ table video {
   max-width: none;
 }
 
+.lt-ie9 div img,
+.lt-ie9 div object,
+.lt-ie9 div embed,
+.lt-ie9 div video,
 .lt-ie9 table img,
 .lt-ie9 table object,
 .lt-ie9 table embed,
@@ -656,4 +743,8 @@ td img {
 .publication-cover-container {
   float:left;
   margin: 0 1.5em .5em 0;
+}
+
+.entity-registration .field-label {
+  padding-right: 5px;
 }

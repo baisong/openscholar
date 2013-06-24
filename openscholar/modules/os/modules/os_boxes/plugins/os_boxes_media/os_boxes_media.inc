@@ -77,6 +77,9 @@ class os_boxes_media extends os_boxes_default {
   }
 
   public function render() {
+    if (module_exists('vsite') && !vsite_get_vsite()) {
+      return;
+    }
     $block = parent::render();
 
     if ($file = file_load($this->options['fid'])) {

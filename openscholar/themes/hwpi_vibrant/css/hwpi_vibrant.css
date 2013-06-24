@@ -28,6 +28,11 @@ body.front #columns {
 }
 
 
+#content-panels {
+    border-right: none;
+    border-left: none;
+}
+
 /* Conditional backgrounds for the slideshow */
 body.no-sidebars .content-top-slideshow-enabled .region-content-top {
   position: relative;
@@ -303,7 +308,7 @@ div.contextual-links-wrapper a,
   border-radius: 0 !important;
 }
 
-#menu-bar ul.menu ul ul {
+#menu-bar ul.nice-menu ul {
     background: #282828;
     min-width: 200px;
 }
@@ -323,7 +328,10 @@ ul.nice-menu-down li ul li ul {
 .links a,
 #footer ul.menu a,
 .boxes-box-content h2,
-.view-os-events .views-field-colorbox {
+.view-os-events .views-field-colorbox,
+.field-name-body h2,
+.field-name-body h3,
+.field-name-body h4 {
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -335,6 +343,10 @@ h1.node-title,
   font-weight: normal;
   font-size: 18px;
   margin-bottom: 18px;
+}
+
+h1.node-title {
+  font-weight: bold;
 }
 
 .boxes-box-content h2 {

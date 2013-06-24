@@ -300,9 +300,12 @@ class os_sv_list_box extends os_boxes_default {
     return $form;
   }
   /**
-   * // * Implementation of boxes_content::render().
+   * Implementation of boxes_content::render().
    */
   public function render() {
+    if (module_exists('vsite') && !vsite_get_vsite()) {
+      return;
+    }
     $block = parent::render();
     $options = $this->options;
     $page_num = isset($_GET['page']) ? $_GET['page'] : 0;

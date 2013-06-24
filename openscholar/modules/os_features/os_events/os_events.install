@@ -85,11 +85,8 @@ function os_events_update_7002() {
 }
 
 /**
- * Removes the old abbreviated date date type format.
+ * Enable the registration module.
  */
-function os_events_update_7003() {
-  db_delete('date_formats')
-    ->condition('format', 'M d, g:ia')
-    ->condition('type', 'os_date_abbreviated')
-    ->execute();
+function os_events_update_7004() {
+  module_enable(array('registration'));
 }

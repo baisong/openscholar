@@ -86,7 +86,7 @@ function vsite_access_views_pre_view(&$view, &$display_id, &$args){
 function vsite_access_robotstxt() {
   global $base_url;
 
-  $robots_settings = variable_get('vsite_access_unindexed_sites', array());
+  $robots_settings = variable_get('vsite_access_robotstxt_directives', array());
   $host = parse_url($base_url, PHP_URL_HOST);
   if (isset($robots_settings[$host])) {
     return $robots_settings[$host];
@@ -292,7 +292,7 @@ function vsite_access_update_privacy_settings($group) {
 }
 
 /**
- * Updates robots.txt settings variable 'vsite_access_unindexed_sites'.
+ * Updates robots.txt settings variable 'vsite_access_robotstxt_directives'.
  *
  * @see vsite_access_robotstxt()
  */
@@ -309,14 +309,20 @@ function vsite_access_update_robots($group, $privacy) {
   // and an additional key for each vsite custom domain.
   // The array holds a sorted (ksort) list of robots.txt directives
   // which are added to that domain's robots.txt file.
-  $directives = variable_get('vsite_access_unindexed_sites');
+  $directives = variable_get('vsite_access_robotstxt_directives', array());
   $base_domain = parse_url(variable_get('purl_base_domain', $base_url), PHP_URL_HOST);
   $vsite_domain = $vsite->controllers->variable->get('vsite_domain_name');
 
   // Checks if this site has a group domain.
   $has_custom_domain = FALSE;
   if ($vsite_domain) {
-    $vsite_domain = parse_url($vsite_domain, PHP_URL_HOST);
+    // Ensures that we're working with a host, not a host + path.
+    $host = parse_url($vsite_domain, PHP_URL_HOST);
+    $path = parse_url($vsite_domain, PHP_URL_PATH);
+    $shared_domain = (bool) (!empty($host) && !empty($path));
+    if ($shared_domain) {
+      $vsite_domain = $host;
+    }
     if ($vsite_domain != $base_domain) {
       $has_custom_domain = TRUE;
     }
@@ -357,6 +363,10 @@ function vsite_access_update_robots($group, $privacy) {
 
     // Also hides other vsites from any custom domain for this vsite.
     if ($has_custom_domain) {
+      // Ensures that the array for this domain's directives exists.
+      if (!isset($directives[$vsite_domain])) {
+        $directives[$vsite_domain] = array();
+      }
       // Uses Allow and Disallow directive to hide only other vsite's files.
       // First, makes an exception to override the Disallow and include this site.
       // Then, excludes all individual sites' files directories based on pattern.
@@ -374,17 +384,17 @@ function vsite_access_update_robots($group, $privacy) {
   // 2. Allow /files/$purl/files (for each public site, keyed by "Allow ID")
   // 3. Disallow /files/*/files (only one entry, keyed by "Disallow others")
   if ($has_custom_domain) {
-    $directives[$vsite_domain] = ksort($directives[$vsite_domain]);
+    ksort($directives[$vsite_domain]);
   }
   // Saves robots changes.
-  variable_set('vsite_access_unindexed_sites', $directives);
+  variable_set('vsite_access_robotstxt_directives', $directives);
 }
 
 /**
  * Implements hook_field_attach_insert().
  */
 function vsite_access_field_attach_insert($entity_type, $entity) {
-  if ($entity_type == 'node' && 'group' == vsite_get_type_from_bundle($entity->type)) {
+  if ($entity_type == 'node' && vsite_get_type_from_bundle($entity->type) == 'group') {
     vsite_access_update_privacy_settings($entity);
   }
 }
@@ -393,7 +403,7 @@ function vsite_access_field_attach_insert($entity_type, $entity) {
  * Implements hook_field_attach_update().
  */
 function vsite_access_field_attach_update($entity_type, $entity) {
-  if ($entity_type == 'node' && 'group' == vsite_get_type_from_bundle($entity->type)) {
+  if ($entity_type == 'node' && vsite_get_type_from_bundle($entity->type) == 'group') {
     vsite_access_update_privacy_settings($entity);
   }
 }

@@ -110,6 +110,9 @@ class os_boxes_site_logo extends os_boxes_default {
     }
 
     function render() {
+      if (module_exists('vsite') && !vsite_get_vsite()) {
+        return;
+      }
       $block = parent::render();
 
       // get the title of the site so we can use it in an alt attribute

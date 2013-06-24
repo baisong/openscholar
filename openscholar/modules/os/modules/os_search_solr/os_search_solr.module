@@ -163,69 +163,64 @@ function os_search_solr_block_view_alter(&$data,$block) {
 
 /**
  * Implements hook_apachesolr_exclude().
+ *
  * Exclude items from the search index.
  */
 function os_search_solr_apachesolr_exclude($entity_id, $entity_type, $row, $env_id) {
-
-  if(!module_exists('og') || $entity_type != 'node' || !og_is_group_content_type($entity_type, $row->bundle)){
-    return FALSE;
+  if (!module_exists('vsite')) {
+    // We don't have groups.
+    return;
   }
 
-  $entity = entity_load($entity_type, array($entity_id));
-  $entity = $entity ? reset($entity) : FALSE;
-
-  if (empty($entity)) {
-    // If the object failed to load, just stop.
-    return FALSE;
+  if ($entity_type != 'node' || !og_is_group_content_type($entity_type, $row->bundle)){
+    // Entity is not a node, or not a group content.
+    return;
   }
 
-  if ($groups = og_get_entity_groups($entity_type, $entity)) {
-    if(count($groups['node'])){
-      //Just check the first group
-      $gid = current($groups['node']);
-      $group = entity_load('node', array($gid));
-      $group = $group ? reset($group) : FALSE;
-      if(module_exists('vsite_access') && !empty($wrapper->{VSITE_ACCESS_FIELD}) && $wrapper->{VSITE_ACCESS_FIELD}->value()){
-        // Private group.
-        return TRUE;
-      }
+  if (!$entity = entity_load_single($entity_type, $entity_id)) {
+    // Entity can't be loaded.
+    return;
+  }
 
-      $map = features_get_component_map('node');
-      $feature = !empty($map[$row->bundle]) ? reset($map[$row->bundle]) : NULL;
+  $wrapper = entity_metadata_wrapper($entity_type, $entity);
+  $gids = $wrapper->{OG_AUDIENCE_FIELD}->value(array('identifier' => TRUE));
+  if (!count($gids)) {
+    // Entity is not assigned to a group.
+    return;
+  }
+  $gid = current($gids);
 
-      if($feature){
+  if (module_exists('vsite_access') && !empty($wrapper->{VSITE_ACCESS_FIELD}) && $wrapper->{VSITE_ACCESS_FIELD}->value()) {
+    // Private group.
+    return TRUE;
+  }
 
-        $result = db_query("
-	          SELECT value
-	          FROM {spaces_overrides}
-	          WHERE type = :type
-	            AND id = :id
-	            AND object_type = :otype
-	            AND object_id = :oid
-			      LIMIT 1",
-          array(
-            ':type' => 'og',
-            ':id' => $gid,
-            ':otype' => 'variable',
-            ':oid' => 'spaces_features'
-          ));
+  $map = features_get_component_map('node');
+  if (!$feature = !empty($map[$row->bundle]) ? reset($map[$row->bundle]) : NULL) {
+    return;
+  }
 
-        foreach ($result as $row) {
-          $features = unserialize($row->value);
-          if(empty($features[$feature])){
-            //Private feature exclude
-            return TRUE;
-          }
-        }
-      }
+  $arguments = array(
+    ':type' => 'og',
+    ':id' => $gid,
+    ':otype' => 'variable',
+    ':oid' => 'spaces_features',
+  );
+
+  $result = db_query("SELECT value FROM {spaces_overrides} WHERE type = :type AND id = :id AND object_type = :otype AND object_id = :oid LIMIT 1", $arguments);
+
+  foreach ($result as $row) {
+    $features = unserialize($row->value);
+    if ($features[$feature] != 1) {
+      // Disabled or private feature.
+      return TRUE;
     }
   }
-
-  return FALSE;
 }
 
 /**
  * Implements hook_apachesolr_process_results().
+ *
  * Remove the user and date from the search results.
  */
 function os_search_solr_apachesolr_process_results(&$arg) {

@@ -16,6 +16,8 @@ openscholar/behat/vendor
 openscholar/behat/bin
 openscholar/behat.local.yml
 composer.phar
+openscholar/composer.lock
+behat/vendor
 
 #make
 openscholar/1/

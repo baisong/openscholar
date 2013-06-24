@@ -51,7 +51,11 @@ class os_boxes_rss extends os_boxes_default {
   /**
    * Implementation of boxes_content::render().
    */
-  public function render(){
+  public function render() {
+    if (module_exists('vsite') && !vsite_get_vsite()) {
+      return;
+    }
+
     // @todo
     $block = parent::render();
 

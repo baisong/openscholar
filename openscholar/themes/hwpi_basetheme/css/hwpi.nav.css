@@ -44,7 +44,7 @@ ul.nice-menu ul {
     top: 3.3em !important;
 }
 
-#menu-bar ul.menu ul ul {
+#menu-bar ul.nice-menu ul {
     background: #F0F0EE;
 }
 
@@ -155,7 +155,7 @@ ul.nice-menu ul {
 
 
 /* Action Nav Header 3rd*/
-.region-header-third ul.menu {
+.region-header-third ul.nice-menu {
 	float:right;
 	margin-bottom: 1em;
 }

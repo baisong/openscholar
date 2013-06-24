@@ -252,6 +252,7 @@ function os_comments_node_view($node, $view_mode) {
   if (in_array($node->type, $group_bundles['node'])) {
     return;
   }
+
   // Does nothing if the Drupal comment settings are already set to open.
   if ($node->comment == COMMENT_NODE_OPEN) {
     return;
@@ -272,10 +273,26 @@ function os_comments_node_view($node, $view_mode) {
 /**
  * Implementation of hook_link_alter()
  *
- * Removes "login to post comment" links.
+ * Removes "login to post comment" links and "Add new comment" where prohibited.
  */
 function os_comments_node_view_alter(&$build) {
-  unset($build['links']['comment']['#links']['comment_forbidden']);
+  // Removes "login to post comment" links
+  if (isset($build['links']['comment']['#links']['comment_forbidden'])) {
+    unset($build['links']['comment']['#links']['comment_forbidden']);
+  }
+  // Removes "Add new comment" where prohibited.
+  if ($build['#view_mode'] != 'full' &&
+    isset($build['links']['comment']['#links']['comment-add'])) {
+    // Removes comment link for non-member authenticated users.
+    $wrapper = entity_metadata_wrapper('node', $build['#node']);
+    if (isset($wrapper->{OG_AUDIENCE_FIELD}) &&
+      $gid = $wrapper->{OG_AUDIENCE_FIELD}->value(array('identifier' => TRUE))) {
+      $is_member = og_is_member('node', $gid[0]);
+      if (!$is_member) {
+        unset($build['links']['comment']['#links']['comment-add']);
+      }
+    }
+  }
 }
 
 /**
@@ -295,8 +312,17 @@ function os_comments_preprocess_node(&$vars) {
       //$vars['content']['links']['comment']['#links']['comment-add']['fragment'] = 'disqus_thread';
       //$vars['content']['links']['comment']['#links']['comment-add']['title'] = t('Add new comment');
     }
-    else if ($vars['node']->os_comments == 'fb_social:Facebook Comments') {
+    elseif ($vars['node']->os_comments == 'fb_social:Facebook Comments') {
       unset($vars['content']['links']['comment']['#links']['comment-add']['fragment']);
+    }
+  }
+  // Removes the "Add new comment" form title when users don't have access.
+  // @see os_comments_form_comment_form_alter()
+  elseif ($vars['view_mode'] == 'full') {
+    if (isset($vars['content']['comments']['comment_form']['#access'])) {
+      if ($vars['content']['comments']['comment_form']['#access'] === FALSE) {
+        unset($vars['content']['comments']['comment_form']);
+      }
     }
   }
 }
@@ -324,9 +350,11 @@ function os_comments_module_implements_alter(&$implementations, $hook) {
     // module_implements() goes thru $implementations with a loop in the order
     // that the items were added, so to move an item to the front of the array,
     // we remove it, then add it.
-    $group = $implementations['os_comments'];
-    unset($implementations['os_comments']);
-    $implementations['os_comments'] = $group;
+    if (isset($implementations['os_comments'])) {
+      $group = $implementations['os_comments'];
+      unset($implementations['os_comments']);
+      $implementations['os_comments'] = $group;
+    }
   }
 }
 
@@ -363,7 +391,7 @@ function os_comments_form_node_form_alter(&$form, $form_state, $form_id) {
   // Try to find this app's info...
   $app_info = os_app_info();
   foreach ($app_info as $app => $info) {
-    if (in_array($node->type, $info['nodetypes'])) {
+    if (!empty($info['nodetypes']) && in_array($node->type, $info['nodetypes'])) {
       // We found the app! Break now and $app is the module's machine name.
       break;
     }
@@ -393,7 +421,35 @@ function os_comments_form_node_form_alter(&$form, $form_state, $form_id) {
     '#weight' => 10,
   );
 
+  $form['comment_settings']['no_comment']['#options'] = empty($form['comment_settings']['no_comment']['#options']) ? array() : $form['comment_settings']['no_comment']['#options'];
   if ($source == 'comment' && isset($form['comment_settings']['comment_status']['#title'])) {
     $form['comment_settings']['comment_status']['#title'] = t('Private comments');
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for comment_form.
+ *
+ * Restricts comment form to just the current vsite's users.
+ *
+ * Since only certain roles (and not anonymous) users may post comments,
+ * This form would only ever appear to authorized roles.
+ * But we still want to restrict comments to just the current vsite's users.
+ */
+function os_comments_form_comment_form_alter(&$form, &$form_state) {
+  // Only looks for users of other groups if vsite module is enabled.
+  if (!module_exists('vsite')) {
+    return;
+  }
+
+  // Allows site member's to access the comment form.
+  $node = $form['#node'];
+  $wrapper = entity_metadata_wrapper('node', $node);
+  $gid = $wrapper->{OG_AUDIENCE_FIELD}[0]->value(array('identifier' => TRUE));
+  if (og_is_member('node', $gid)) {
+    return;
+  }
+
+  // Denies non-members from accessing the form.
+  $form['#access'] = FALSE;
 }

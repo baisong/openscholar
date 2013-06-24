@@ -21,6 +21,7 @@ function os_events_os_app_info() {
         'page_3' => array('calendar'), // Year display
         'page_4', // Upcoming
         'feed_1', // iCal
+        'feed_2', // rss
       ),
     ),
   );
@@ -71,6 +72,22 @@ function os_events_vsite_og_node_type_info() {
   return array(
     'event' => 'group content',
   );
+}
+
+/**
+ * Implements hook_default_registration_type().
+ */
+function os_events_default_registration_type() {
+  $items = array();
+  $items['event_signup_simple'] = entity_import('registration_type', '{
+    "name" : "event_signup_simple",
+    "label" : "Event signup",
+    "locked" : "0",
+    "weight" : "0",
+    "data" : null,
+    "rdf_mapping" : []
+  }');
+  return $items;
 }
 
 /**
@@ -132,6 +149,34 @@ function os_events_preprocess_calendar_datebox(&$vars) {
  * Implements hook_views_pre_view().
  */
 function os_events_views_pre_view(&$view, &$display_id, &$args) {
+  if ($view->name != 'os_events') {
+    return;
+  }
+
+  if (!in_array($display_id, array('block_2', 'block_1'))) {
+    foreach (array('iCal' => 'calendar/export.ics', 'rss' => 'calendar/rss.xml') as $label => $path) {
+
+      // When the user is filtering events by taxonomy term we need to add the
+      // path to the iCal/rss export path.
+      if (os_taxonomy_in_taxonomy_term_context($view)) {
+        // Get the current taxonomy term path from the $_GET['q'] and remove the
+        // word calendar for prevent duplication of the word.
+        $path .= str_replace('calendar', '', $_GET['q']);
+      }
+
+      $links[] = array(
+        'title' => t($label),
+        'href' => $path,
+        'attributes' => array('class' => array(strtolower($label))),
+      );
+    }
+
+    $view->attachment_before .= theme('links', array(
+      'links' => $links,
+      "attributes" => array('class' => array('links', 'inline')),
+    ));
+  }
+
   if (empty($view->display_handler->display->display_options['pager']['options']['date_id'])) {
     // Not a calendar view, or a mini-calendar
     return;
@@ -370,4 +415,195 @@ function os_events_preprocess_link(&$variables) {
   if (isset($cases[$_GET['type']]) && $cases[$_GET['type']] == $variables['path']) {
     $variables['options']['attributes']['class'][] = 'active';
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function os_events_form_registration_entity_settings_form_alter(&$form, $form_state) {
+  $form['status']['#title'] = t('Enable registrations');
+  $form['status']['#description'] = t('Users must register their attendance in advance.');
+
+  $open_date = $form['scheduling']['open']['#default_value'];
+  $close_date = $form['scheduling']['close']['#default_value'];
+  $reminder_date = $form['reminder']['reminder_settings']['reminder_date']['#default_value'];
+
+  $format = 'M d Y H:i';
+  // Replace textual date fields in favor of date popup.
+  $form['scheduling']['open'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Open date'),
+    '#description' => t('When to automatically open registrations'),
+    '#default_value' => empty($open_date) ? '' : date('Y-m-d H:i', strtotime($open_date)),
+    '#date_format' => $format,
+  );
+
+  $form['scheduling']['close'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Close date'),
+    '#description' => t('When to automatically close registrations.'),
+    '#default_value' => empty($close_date) ? '' : date('Y-m-d H:i', strtotime($close_date)),
+    '#date_format' => $format,
+  );
+
+  $form['reminder']['reminder_settings']['reminder_date'] = array(
+    '#type' => 'date_popup',
+    '#title' => t('Reminder Date'),
+    '#description' => t('When to send reminders.'),
+    '#default_value' => date('Y-m-d H:i', strtotime($reminder_date)),
+    '#date_format' => $format,
+    '#states' => array(
+      'visible' => array(
+        ':input[name="reminder[send_reminder]"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+
+  // Remove the template, reminder date is no longer inside a container.
+  $form['reminder']['reminder_settings']['reminder_template'] = $form['reminder']['reminder_settings']['reminder_template'] + array(
+    '#access' => FALSE,
+    '#value' => variable_get('os_reminder_template', "
+Hello [registration:author:name],
+
+You request to send a reminder for the event <a href='[node:url]'>[node:title]</a>.
+    "),
+  );
+  $form['reminder']['reminder_settings']['token_tree']['#access'] = FALSE;
+  $form['reminder']['reminder_settings']['#type'] = 'container';
+  $form['reminder']['#type'] = 'container';
+  $form['settings']['#access'] = FALSE;
+
+  $form['reminder']['#weight'] = 9;
+  $form['scheduling']['#weight'] = 10;
+  $form['save']['#weight'] = 11;
+}
+
+/**
+ * Implements hook_field_widget_WIDGET_TYPE_form_alter().
+ */
+function os_events_field_widget_registration_select_form_alter(&$element, &$form_state, $context) {
+  $element['registration_type']['#type'] = 'checkbox';
+
+  // Set the "return value" to our default signup.
+  $element['registration_type']['#return_value'] = 'event_signup_simple';
+
+  $items = $context['items'];
+  $element['registration_type']['#default_value'] = !empty($items[0]['registration_type']);
+
+  // Remove the options, so they won't fail our validation.
+  unset($element['registration_type']['#options']);
+
+  $element['registration_type']['#title'] = t('Signup');
+  $element['registration_type']['#description'] = t('If checked, users will be able to signup for this event.');
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function os_events_menu_alter(&$items) {
+  $items['node/%entity_object/register']['access callback'] = FALSE;
+  $items['admin/structure/registration/registration_states']['access callback'] = FALSE;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * 
+ * Hide the tokens list for sending messages to registrants
+ */
+function os_events_form_registration_registrations_broadcast_form_alter(&$form, $form_state) {
+  unset($form['token_tree']);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function os_events_form_registration_form_alter(&$form, $form_state) {
+  // Remove the entity from the form - we don't need it and it disable the
+  // header.
+  // @TODO: figure out why the $form['#entity'] disable the header.
+  unset($form['#entity']);
+
+  $node = node_load($form_state['registration']->entity_id);
+
+  $form['who_is_registering'] = array(
+    '#type' => 'value',
+    '#value' => 'registration_registrant_type_anon',
+  );
+
+  $form['actions']['cancel']['#access'] = FALSE;
+  $form['actions']['submit']['#value'] = t('Signup');
+
+  $form['event_register'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Sign up for @label', array('@label' => $node->title)),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+
+    'field_full_name' => $form['field_full_name'],
+    'field_department' => $form['field_department'],
+    'anon_mail' => $form['anon_mail'],
+    'actions' => $form['actions'],
+  );
+
+  foreach (array('captcha', 'mollom') as $captcha) {
+    if (!empty($form[$captcha])) {
+      $form['event_register'][$captcha] = $form[$captcha];
+    }
+  }
+
+  unset($form['actions'], $form['field_full_name'], $form['field_department'], $form['anon_mail'], $form['captcha'], $form['user'], $form['mollom']);
+}
+
+/**
+ * Implements hook_preprocess_table().
+ */
+function os_events_preprocess_table(&$variables) {
+  $menu = menu_get_item();
+
+  if ($menu['path'] != 'node/%/registrations') {
+    return;
+  }
+
+  // Change the title of the registrations table.
+  $variables['caption'] = t('List of registrations for %title.', array(
+    '%title' => entity_label('node', $menu['map'][1]),
+  ));
+
+  // Remove the "count" and the "states" from the table head.
+  unset($variables['header'][4], $variables['header'][6]);
+
+  // Remove the "count" and the "states" from each table row.
+  foreach (array_keys($variables['rows']) as $delta) {
+    unset($variables['rows'][$delta][4], $variables['rows'][$delta][6]);
+  }
+}
+
+/**
+ * Implements hook_mollom_form_list().
+ */
+function os_events_mollom_form_list() {
+  $forms = array();
+  $forms['registration_form'] = array(
+    'title' => t('Registration form'),
+    'entity' => 'registration',
+    'bundle' => 'event_signup_simple',
+  );
+  return $forms;
+}
+
+/**
+ * Implements hook_mollom_form_info().
+ */
+function os_events_mollom_form_info($form_id) {
+  $form_info = array(
+    'bundle' => 'event_signup_simple',
+    'elements' => array(),
+    'mapping' => array(
+      'author_email' => 'anon_email',
+    ),
+  );
+
+  mollom_form_info_add_fields($form_info, 'registration', 'event_signup_simple');
+
+  return $form_info;
 }

@@ -193,8 +193,8 @@ function os_activity_message_node_create($node, $op) {
   $group_wrapper = og_is_group('node', $node) ? $node : $node_wrapper->{OG_AUDIENCE_FIELD}->get(0);
   $wrapper->field_group->set($group_wrapper->value());
 
-  if (isset($group_wrapper->{OG_ACCESS_FIELD})) {
-    $is_private = (int) $group_wrapper->{OG_ACCESS_FIELD}->value();
+  if (isset($group_wrapper->{VSITE_ACCESS_FIELD})) {
+    $is_private = (int) $group_wrapper->{VSITE_ACCESS_FIELD}->value();
   }
   else {
     $is_private = TRUE;

@@ -6,6 +6,13 @@
  */
 
 /**
+ * Defines the three vsite role names.
+ */
+define('OS_USER_ROLE_ADMIN', 'vsite admin');
+define('OS_USER_ROLE_EDITOR', 'content editor');
+define('OS_USER_ROLE_BASIC', 'vsite user');
+
+/**
  * Implements hook_menu().
  */
 function cp_user_menu() {
@@ -29,7 +36,7 @@ function cp_user_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['cp/users/delete_membership/%user_id'] = array(
+  $items['cp/users/delete_membership/%user'] = array(
     'type' => MENU_CALLBACK,
     'title' => t('Remove Membership'),
     'page callback' => 'drupal_get_form',
@@ -38,26 +45,7 @@ function cp_user_menu() {
     'file' => 'cp_user.pages.inc',
   );
 
-  $items['cp/users/create_admin/%user_id'] = array(
-    'type' => MENU_CALLBACK,
-    'title' => 'Group Membership',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('cp_user_make_admin_confirm', 3),
-    'access callback' => 'cp_user_admin_access',
-    'file' => 'cp_user.pages.inc',
-  );
-
-  $items['cp/users/remove_admin/%user_id'] = array(
-    'type' => MENU_CALLBACK,
-    'title' => 'Group Membership',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('cp_user_remove_admin_confirm', 3),
-    'access callback' => 'cp_user_admin_access',
-    'file' => 'cp_user.pages.inc',
-  );
-
-  /*
-  $items['cp/users/edit_membership/%user_id'] = array(
+  $items['cp/users/edit_membership/%user'] = array(
     'type' => MENU_CALLBACK,
     'title' => 'Edit Member',
     'page callback' => 'drupal_get_form',
@@ -65,7 +53,7 @@ function cp_user_menu() {
     'access callback' => 'cp_user_admin_access',
     'file' => 'cp_user.pages.inc',
   );
-  */
+
   return $items;
 }
 
@@ -81,8 +69,7 @@ function cp_user_admin_access() {
  */
 function cp_user_admin_paths() {
   $paths = array(
-    'cp/users/create_admin/*' => TRUE,
-    'cp/users/remove_admin/*' => TRUE,
+    'cp/users/edit_membership/*' => TRUE,
     'cp/users/delete_membership/*' => TRUE,
     'cp/users/add' => TRUE,
   );
@@ -96,7 +83,7 @@ function cp_user_admin_paths() {
  * @param $op
  *   The operation needed. Defaults to "members".
  */
-function cp_user_admin($op = 'members') {
+function cp_user_admin($op = 'list') {
   $vsite = spaces_get_space();
   switch ($op) {
     case 'add':
@@ -108,7 +95,7 @@ function cp_user_admin($op = 'members') {
       $build['user_register'] = drupal_get_form('user_register_form');
       break;
 
-    case 'members':
+    case 'list':
     default:
       $build = cp_user_user_management_page($vsite->id);
   }
@@ -131,13 +118,13 @@ function cp_user_form_og_ui_add_users_alter(&$form, $form_state) {
   $form['og_user']['name']['#title'] = t('User');
   // The new autocomplete is for vsites, only switch the autocomplete if vsite is enabled.
   if (module_exists('vsite')) {
-    $form['og_user']['name']['#description'] = t('Type in a persons name, login, or e-mail address to search for their account.');
+    $form['og_user']['name']['#description'] = t('Type in a person\'s name, username, or e-mail address to search for their existing account.');
     // Add the new user autocomplete function.
     $form['og_user']['name']['#autocomplete_path'] = 'vsite/autocomplete/user';
   }
   $form['og_user']['link_text'] = array(
     '#type' => 'item',
-    '#markup' => '<div id="cp-user-create-new">' . t('If you can\'t find their account, click "!create_new" to create a new account.',
+    '#markup' => '<div id="cp-user-create-new">' . t('Can\'t find their account above? !create_new.',
       array('!create_new' => $ajax_link)
     ) . '</div>',
     '#weight' => 2,
@@ -165,8 +152,7 @@ function cp_user_form_og_ui_add_users_alter(&$form, $form_state) {
 }
 
 /**
- * Submit handler; redirect the user back to the /cp/users page
- * after submitting the add user.
+ * Submit handler; maybe grants a role, then redirects user back to "cp/users".
  */
 function cp_user_og_ui_add_users_submit(&$form, &$form_state) {
 
@@ -199,7 +185,7 @@ function cp_user_field_access($op, $field, $entity_type, $entity, $account) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter() for user_register_form.
  *
  * Altering the user_register_form to add a secondary submit function
  * that will also add a user to the site
@@ -235,7 +221,7 @@ function cp_user_form_user_register_form_alter(&$form, &$form_state, $form_id) {
     $form['account']['roles']['#access'] = FALSE;
     // Change the submit button text to let the user know they will also
     // be adding to their site as well as creating the user, in one step.
-    $form['actions']['submit']['#value'] = t('Create and Add User');
+    $form['actions']['submit']['#value'] = t('Create and add member');
   }
 }
 
@@ -273,18 +259,7 @@ function cp_user_user_register_submit($form, &$form_state) {
 }
 
 /**
- * Implements hook_load().
- *
- * Return the loaded user from the passed user ID, or FALSE if no user
- * exists.
- */
-function user_id_load($user_id) {
-  $account = user_load($user_id);
-  return $account ? $account : FALSE;
-}
-
-/**
- * Implements hook_form_BASE_FORM_ID_alter();
+ * Implements hook_form_BASE_FORM_ID_alter() for cp_settings_form.
  */
 function cp_user_form_cp_settings_form_alter(&$form, &$form_state) {
   if (isset($form['admin-menu'])) {
@@ -292,3 +267,51 @@ function cp_user_form_cp_settings_form_alter(&$form, &$form_state) {
   }
 }
 
+/**
+ * Returns an associative array mapping role names to human readable names.
+ *
+ * @param bool $verbose
+ *   If TRUE, formats a 2-line label with descriptive help text for each role.
+ *
+ * @return array $roles
+ */
+function _cp_user_list_roles($mode = 'names', $bundle = NULL) {
+  $roles = array();
+
+  $machine_names = array(
+    OS_USER_ROLE_BASIC,
+    OS_USER_ROLE_EDITOR,
+    OS_USER_ROLE_ADMIN,
+  );
+  $human_names = array(
+    t('Basic member'),
+    t('Content editor'),
+    t('Administrator'),
+  );
+
+  switch ($mode) {
+    case 'names':
+      $roles = array_combine($machine_names, $human_names);
+      break;
+
+    case 'options':
+      $descriptions = array(
+        t('<em>Basic members</em> may only add new posts and edit their own posts.'),
+        t('<em>Content editors</em> may add and edit posts, and also edit others\' posts.'),
+        t('<em>Administrators</em> may add, edit or delete any post, and change site settings.'),
+      );
+      for ($i = 0; $i < sizeof($machine_names); $i++) {
+        $roles[$machine_names[$i]] = _cp_user_role_option($human_names[$i], $descriptions[$i]);
+      }
+      break;
+
+    case 'rids':
+      $og_roles = og_roles('node', $bundle);
+      for ($i = 0; $i < sizeof($machine_names); $i++) {
+        $roles[$machine_names[$i]] = array_search($machine_names[$i], $og_roles);
+      }
+      break;
+  }
+
+  return $roles;
+}

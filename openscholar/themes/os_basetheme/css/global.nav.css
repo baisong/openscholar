@@ -447,7 +447,7 @@ ul.contextual-links li,
  line-height: 12px !important;
  list-style: none !important;
  clear:both;
- background-color: none;
+ background: none !important;
 border-top: none;
 margin-bottom: 0 !important;
 }
@@ -488,7 +488,8 @@ color: #FFF !important;
 }
 
 #content-column div.contextual-links-wrapper.contextual-links-processed {
-   right: -15px;
+   /*right: -15px;*/
+   right: 0;
    z-index: 19;
 }
 

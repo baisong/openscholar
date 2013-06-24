@@ -22,7 +22,7 @@ border-top:3px solid #DDD;
     color: #FFFFFF;
 }
 
-#menu-bar ul.menu ul ul {
+#menu-bar ul.nice-menu ul {
     background: #293352;
 }
 
@@ -49,6 +49,7 @@ border-top:3px solid #DDD;
     font-size: 14px;
     text-transform: none;
     padding: 3px 7px;
+    margin-bottom: 10px;
  
 }
 

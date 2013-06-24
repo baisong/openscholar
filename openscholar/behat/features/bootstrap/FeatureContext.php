@@ -867,4 +867,81 @@ class FeatureContext extends DrupalContext {
     $duration = 5000;
     $this->getSession()->wait($duration);
   }
+
+  /**
+   * @Given /^I set the event capacity to "([^"]*)"$/
+   */
+  public function iSetTheEventCapacityTo($capacity) {
+    return array(
+      new Step\When('I click "Manage Registrations"'),
+      new Step\When('I click on link "Settings" under "main-content-header"'),
+      new Step\When('I fill in "edit-capacity" with "' . $capacity . '"'),
+      new Step\When('I press "Save Settings"'),
+    );
+  }
+
+  /**
+   * @Given /^I click on link "([^"]*)" under "([^"]*)"$/
+   */
+  public function iClickOnLinkUnder($link, $container) {
+    $page = $this->getSession()->getPage();
+    $element = $page->find('xpath', "//*[contains(@id, '{$container}')]//a[contains(., '{$link}')]");
+    $element->press();
+  }
+
+  /**
+   * @Then /^I delete "([^"]*)" registration$/
+   */
+  public function iDeleteRegistration($arg1) {
+    return array(
+      new Step\When('I am not logged in'),
+      new Step\When('I am logged in as "john"'),
+      new Step\When('I visit "john/halleys-comet"'),
+      new Step\When('I click "Manage Registrations"'),
+      new Step\When('I click "Delete"'),
+      new Step\When('I press "Delete"'),
+    );
+  }
+
+  /**
+   * @Given /^I turn on event registration on "([^"]*)"$/
+   */
+  public function iTurnOnEventRegistrationOn($location) {
+    return $this->eventRegistrationChangeStatus($location);
+  }
+
+  /**
+   * @Given /^I turn off event registration on "([^"]*)"$/
+   */
+  public function iTurnOffEventRegistrationOn($location) {
+    return $this->eventRegistrationChangeStatus($location);
+  }
+
+  /**
+   * Change the event registration status.
+   */
+  private function eventRegistrationChangeStatus($title) {
+    $title = str_replace("'", "\'", $title);
+    $nid = $this->invoke_code('os_migrate_demo_get_node_id', array("'{$title}'"));
+    return array(
+      new Step\When('I visit "node/' . $nid . '/edit"'),
+      new Step\When('I check the box "Signup"'),
+      new Step\When('I press "Save"'),
+    );
+  }
+
+  /**
+   * @Given /^no boxes display outside the site context$/
+   */
+  function noBoxesDisplayOutsideTheSiteContext() {
+    // Runs a test of loading all existing boxes and checking if they have output.
+    // @todo ideally we would actually create a box of each kind and test each.
+    $code = 'include_once("profiles/openscholar/modules/os/modules/os_boxes/tests/os_boxes.behat.inc");';
+    $code .= '_os_boxes_test_load_all_boxes_outside_vsite_context();';
+    $error = $this->getDriver()->drush("php-eval \"{$code}\"");
+    if ($error) {
+      throw new Exception(sprintf("At least one box returned output outside of a vsite: %s", $key));
+    }
+  }
 }
+

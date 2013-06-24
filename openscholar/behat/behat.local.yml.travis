@@ -6,6 +6,8 @@ default:
           'admin'
         john:
           'jfk'
+        michelle:
+          'FourMoreYears'
       # the node ID of the group
       vsite:
         1

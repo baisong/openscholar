@@ -38,7 +38,7 @@ before_script:
   # Copy Behat configuration file.
   - cd profiles/openscholar/behat
   - cp behat.local.yml.travis behat.local.yml
-  - curl -sS https://getcomposer.org/installer | php
+  - curl -s https://getcomposer.org/installer | php
   - php composer.phar install --prefer-source
 
 script:

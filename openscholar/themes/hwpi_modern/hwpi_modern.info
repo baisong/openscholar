@@ -22,7 +22,6 @@
 ;----------// Stylesheets
 
   stylesheets[screen][] = css/hwpi_modern.css
-  stylesheets[screen][] = css/responsive.modern.css
 
 
 

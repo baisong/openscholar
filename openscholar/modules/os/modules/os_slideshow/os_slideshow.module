@@ -545,6 +545,6 @@ function _os_slideshow_add_css() {
   if ($file = @$theme->info['os']['os_slideshow']) {
     drupal_add_css(drupal_get_path('theme', $theme->name)) . $file;
   } else {
-    drupal_add_css(drupal_get_path('module', 'os_slideshow')) . '/os_slideshow.css';
+    drupal_add_css(drupal_get_path('module', 'os_slideshow') . '/os_slideshow.css');
   }
 }

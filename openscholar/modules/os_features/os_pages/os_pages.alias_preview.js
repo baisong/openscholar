@@ -13,7 +13,7 @@
                     var alias = $('#edit-path-alias').val();
                     if (alias.length) {
                         var base_url = Drupal.settings.alias_preview.prefix;
-                        var description = '<strong>Link URL:</strong> ' + base_url + '/' + alias + ' <a id="pathauto-extra-edit-path" href="#path[pathauto]">edit</a>';
+                        var description = '<strong>URL:</strong> ' + base_url + '/' + alias + ' <a id="pathauto-extra-edit-path" href="#path[pathauto]">edit</a>';
                         alias_preview_description_init();
                         $('.form-item-title .description').html(description);
                         alias_preview_scroll();

@@ -1,6 +1,5 @@
 @media (max-width: 1008px) {
 
-
 .view .date-nav-wrapper .date-next {
     right: 0;
 }
@@ -10,31 +9,48 @@
     margin-right: 0;
 }
 /*Menu*/
-#menu-bar ul.menu ul ul {
+
+/*To pass accessibility scans*/
+.mobile-buttons li {
+     background: #000000;
+}
+
+.mobile-buttons li a {
+     color: #FFFFFF;
+}
+
+#menu-bar ul.nice-menu ul {
     background: none repeat scroll 0 0 #24527A;
 }
-.region-header-third .block-os-search-solr,
-.region-header-third .block-os-search-db {
-    left: 30px;
-    margin-bottom: -80px;
-    position: relative;
-    top: 55px;
+
+#search-block-form .container-inline .form-item .form-text {
+    border-radius: 0 0 0 0 !important;
 }
 /*Layout*/
 .page-node #content-column .content-inner {
     margin-left: 25%;
     padding: 0 !important;
 }
+.no-sidebars.page-node #content-column .content-inner {
+    margin-left: 0;
+    padding: 0 !important;
+}
 /*Calendar controls*/
 .view .date-nav-wrapper .date-prev {
-    right: 94%!important;
+    right: 94%;
 }
-.region-sidebar-first .date-prev,
+.region-sidebar-first .date-prev {
+    right: 90%;
+}
 .region-sidebar-second .date-prev {
-    right: 90% !important;
+    right: 90% ;
 }
+iframe {
+    max-width: 100%;
+}		
 }
 
+/*--------------------------------------------------------*/
 @media (max-width: 768px) {
 	
 /*Layout*/
@@ -59,9 +75,9 @@
 .footer-right .region-footer-third {
     width: 100%;
 }
-
-
 }
+
+/*--------------------------------------------------------*/
 @media (max-width: 479px){
 	
 /*Layout*/	
@@ -70,11 +86,11 @@
 .block-boxes-os_sv_list_box .node.node-person .field-name-field-person-photo {
     float: none;
     margin-right: 0!important;
-        width: 100%;
+    width: 100%;
 }
 article.node-teaser.node-person .field-name-field-person-photo ~ .node-header, article.node-teaser.node-person .field-name-field-person-photo ~ .node-content {
     margin-left: 0!important;
-        width: 100%;
+    width: 100%;
 }
 .block-boxes-os_sv_list_box .node.node-news.node-promoted.article .field-type-image ~ .node-content, 
 .block-boxes-os_sv_list_box .node.node-person.article.with-person-photo .node-content {
@@ -89,12 +105,9 @@ article.node-teaser.node-person .field-name-field-person-photo ~ .node-header, a
 }
 .node-news.node-teaser .field-name-field-photo {
     float: none !important;
-}
-	
+}	
 .two-sidebars #content-panels,
 .one-sidebar.sidebar-second #content-panels {
     border-right: 0!important;
 }	
-	
-	
 }

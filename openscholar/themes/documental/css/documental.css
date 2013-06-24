@@ -120,20 +120,20 @@ p {
   background:#3b484d;
   }
   
-#menu-bar ul.menu li {
+#menu-bar ul.nice-menu li {
 	padding-left: 5px;
 }
 
 #menu-bar,
-#menu-bar ul.menu li a,
-#menu-bar ul.menu li a:visited {
+#menu-bar ul.nice-menu li a,
+#menu-bar ul.nice-menu li a:visited {
   color:#fff;
   font-size: 17px;
   text-decoration: none;
   padding: 8px 15px;
   }
   
-#menu-bar ul.menu li a:hover {
+#menu-bar ul.nice-menu li a:hover {
   color:#BAC5C6;
   }  
   

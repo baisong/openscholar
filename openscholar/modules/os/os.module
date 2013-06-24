@@ -377,6 +377,15 @@ function os_theme() {
 }
 
 /**
+ * Implements hook_theme_registry_alter
+ *
+ * Removes template_preprocess_menu_tree so that os_basetheme_preprocess_menu_tree has access to all vars.
+ */
+function os_theme_registry_alter(&$reg) {
+  $reg['menu_tree']['preprocess functions'] = array_diff($reg['menu_tree']['preprocess functions'], array('template_preprocess_menu_tree'));
+}
+
+/**
  * Implements hook_module_implements_alter().
  *
  * Removes purl from hook_init's implementations queue since it was already run
@@ -404,7 +413,7 @@ function os_module_implements_alter(&$implementations, $hook) {
 function os_menu_local_tasks_alter(&$data, $router_item, $root_path) {
   // Remove the local tasks if we're in an overlay.
   // All items after /node/%/ should be in an overlay now.
-  if (strpos($root_path, 'node/%/') !== FALSE) {
+  if (strpos($root_path, 'node/%/') !== FALSE && overlay_get_mode() == 'child') {
     // remove node-specific tasks
     $data['tabs'] = array();
   }
