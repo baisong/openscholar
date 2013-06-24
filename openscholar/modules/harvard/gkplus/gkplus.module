@@ -656,6 +656,9 @@ function gkplus_module_implements_alter(&$implementations, $hook) {
     // module_implements() goes thru $implementations with a loop in the order
     // that the items were added, so to move an item to the end of the array,
     // we remove it, then then add it.
+    if (!isset($implementations['gkplus'])) {
+      return;
+    }
     $group = $implementations['gkplus'];
     unset($implementations['gkplus']);
     $implementations['gkplus'] = $group;
