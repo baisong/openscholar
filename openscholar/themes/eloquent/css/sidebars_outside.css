@@ -69,6 +69,7 @@ line-height:22px;
 
 #menu-bar a:hover {
     color: #444;
+    text-decoration:underline;
 }
 
 #menu-bar ul.nice-menu ul {
@@ -145,6 +146,9 @@ h1#page-title {
 
 h2.block-title {
     margin-bottom: 0.5em;
+}
+#footer .footer-login:hover {
+    color: #4A4A4A;
 }
 
 #powered-by a {

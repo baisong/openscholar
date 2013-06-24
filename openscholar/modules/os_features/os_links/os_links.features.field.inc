@@ -52,6 +52,12 @@ function os_links_field_default_fields() {
           'type' => 'text_default',
           'weight' => '0',
         ),
+        'sidebar_teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
         'teaser' => array(
           'label' => 'hidden',
           'module' => 'text',
@@ -127,11 +133,17 @@ function os_links_field_default_fields() {
           'type' => 'link_default',
           'weight' => '1',
         ),
+        'sidebar_teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
         'teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
-          'weight' => '1',
+          'weight' => '3',
         ),
       ),
       'entity_type' => 'node',
@@ -205,17 +217,24 @@ function os_links_field_default_fields() {
       'description' => '',
       'display' => array(
         'default' => array(
-          'label' => 'hidden',
-          'module' => 'os_files',
+          'label' => 'above',
+          'module' => 'file',
           'settings' => array(),
-          'type' => 'os_files_image_list',
+          'type' => 'file_default',
           'weight' => 4,
         ),
-        'teaser' => array(
+        'sidebar_teaser' => array(
           'label' => 'above',
           'settings' => array(),
           'type' => 'hidden',
           'weight' => 0,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'module' => 'file',
+          'settings' => array(),
+          'type' => 'file_default',
+          'weight' => '1',
         ),
       ),
       'entity_type' => 'node',

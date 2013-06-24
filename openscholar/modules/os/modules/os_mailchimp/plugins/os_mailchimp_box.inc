@@ -79,6 +79,10 @@ class os_boxes_mailchimp extends os_boxes_default {
    * Implementation of boxes_content::render().
    */
   public function render() {
+    if (module_exists('vsite') && !vsite_get_vsite()) {
+      return;
+    }
+
     $block = parent::render();
     global $user;
     $defaults = $this->options_defaults();
@@ -94,17 +98,11 @@ class os_boxes_mailchimp extends os_boxes_default {
         if ($info['data']) {
           foreach ($info['data'] as $list_info) {
             if ($list_info['id'] == $this->options['list']) {
-              $iframe = array(
-                'element' => array('#tag' => 'iframe', 
-                  '#attributes' => array(
-                    'src' => $list_info['subscribe_url_long'], 
-                    'width' => 640, 
-                    'height' => (intval($this->options['mailchimp_iframe_height']) > 0) ? $this->options['mailchimp_iframe_height'] : $defaults['mailchimp_iframe_height'], 
-                    'style' => 'border: 0; overflow-y: hidden;'
-                  )
-                )
-              );
-              $block['content'] = '<div>' . theme('html_tag', $iframe) . '</div>';
+              $block['content'] = t('<iframe src="@url" width="@width", height="@height"></iframe>', array(
+                '@url' => $list_info['subscribe_url_long'],
+                '@width' => "640px",
+                '@height' => (intval($this->options['mailchimp_iframe_height']) > 0) ? $this->options['mailchimp_iframe_height'] : $defaults['mailchimp_iframe_height'],
+              ));
               break;
             }
           }

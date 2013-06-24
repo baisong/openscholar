@@ -159,10 +159,14 @@ a.rslides_nav.prev {
 }
 
  #layout_3_1_overlay .hero-copy {
-    background: none repeat scroll 0 0 rgba(30, 30, 30, 0.6);
+     background: none repeat scroll 0 0 rgba(30, 30, 30, 0.6);
     position: relative;
     width: 420px;
     z-index: 2;
+}
+
+.lt-ie9  #layout_3_1_overlay .hero-copy {
+     background: url('../images/transparent-black.png');
 }
 
  #layout_3_1_overlay .rslides li {
@@ -209,7 +213,6 @@ a.rslides_nav.prev {
 }
 
 #layout_16_9_overlay .hero {
-    min-height: 430px;
     padding: 0 !important;
     z-index: 1;
 }	
@@ -225,6 +228,10 @@ a.rslides_nav.prev {
     padding:0;
     min-height:170px;
 }	
+
+.lt-ie9  #layout_16_9_overlay .hero-copy {
+     background: url('../images/transparent-black.png');
+}
 	
 #layout_16_9_overlay .rslides_tabs {
     background: none repeat scroll 0 0 transparent;

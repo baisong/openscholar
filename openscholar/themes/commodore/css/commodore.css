@@ -206,8 +206,9 @@ input[type="search"] {
 }
 
 
-#menu-bar ul ul li a:hover, #menu-bar ul ul li a.active {
-     background: none repeat scroll 0% 0% #DADADA;
+
+#menu-bar ul li a:hover, #menu-bar ul li a.active {
+     background: none;
      color: #5D7485;
 }
 
@@ -217,11 +218,12 @@ input[type="search"] {
 }
 
 
-
-#menu-bar ul li a:hover, #menu-bar ul li a.active {
-     background: none;
+#menu-bar ul.nice-menu li a:hover, 
+#menu-bar ul.nice-menu li a.active{
+     background: #DADADA;
      color: #5D7485;
 }
+
 
 
 /* NICE MEUNS */

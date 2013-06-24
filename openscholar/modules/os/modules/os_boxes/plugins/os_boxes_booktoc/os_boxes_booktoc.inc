@@ -71,6 +71,9 @@ class os_boxes_booktoc extends os_boxes_default {
    * Implementation of boxes_content::render().
    */
   public function render() {
+    if (module_exists('vsite') && !vsite_get_vsite()) {
+      return;
+    }
     $block = parent::render();
 
     // Checks for the table of contents display position setting configured

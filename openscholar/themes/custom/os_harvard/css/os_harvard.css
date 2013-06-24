@@ -184,19 +184,19 @@ ul.grid {
   }
   
 
-#menu-bar ul.menu li {
+#menu-bar ul.nice-menu li {
 	padding-left: 5px;
 }
 
 #menu-bar,
-#menu-bar ul.menu li a,
-#menu-bar ul.menu li a:visited {
+#menu-bar ul.nice-menu li a,
+#menu-bar ul.nice-menu li a:visited {
   color:#fff;
   font-size: 17px;
   text-decoration: none;
   }
   
-#menu-bar ul.menu li a:hover {
+#menu-bar ul.nice-menu li a:hover {
   color:#BAC5C6;
   }  
 
@@ -507,29 +507,29 @@ border-bottom-left-radius: 5px;
     margin-top: -10px;
 }
 
-#menu-bar ul.menu {
+#menu-bar ul.nice-menu {
     margin-bottom:0;
     text-align: right;
     float:right;
 }
 
-#menu-bar ul.menu li a,
-#menu-bar ul.menu li a:visited {
+#menu-bar ul.nice-menu li a,
+#menu-bar ul.nice-menu li a:visited {
 font-size: 20px;
 color:#000;
 } 
 
-#menu-bar ul.menu li a:hover,
-#menu-bar ul.menu li a.active {
+#menu-bar ul.nice-menu li a:hover,
+#menu-bar ul.nice-menu li a.active {
   color: #df0800 !important;
   }
 
-#menu-bar ul.menu li.first a {
+#menu-bar ul.nice-menu li.first a {
   background:url('../images/download.png') no-repeat 0 29px transparent;
   padding-left: 23px;
   }
   
-#menu-bar ul.menu li {
+#menu-bar ul.nice-menu li {
     line-height: 75px;
    display:inline-block;
 }  

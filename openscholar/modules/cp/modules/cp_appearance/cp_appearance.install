@@ -8,6 +8,7 @@
 /**
  * Implements hook_requirements().
  */
+/*
 function cp_appearance_requirements() {
   if (!function_exists('libraries_get_libraries')) {
     return array();
@@ -39,3 +40,4 @@ function cp_appearance_requirements() {
     return $requirements;
   }
 }
+ */

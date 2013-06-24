@@ -618,7 +618,7 @@ function os_pages_form_node_form_alter_add_assets(&$form, $type = 'page') {
         // Absolute path to homepage includes purl for standard & group sites.
         if (module_exists('vsite_domain')) {
           $prefix = rtrim(url('<front>', array('absolute' => TRUE)), '/');
-          // This prefix is prepended to aliases and inserted after "Link URL".
+          // This prefix is prepended to aliases and inserted after "URL:".
           $data['alias_preview']['prefix'] = $prefix;
         }
       }

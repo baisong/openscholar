@@ -60,3 +60,22 @@ function os_pinserver_auth_uninstall() {
   //drop pinserver table
   drupal_uninstall_schema('os_pinserver_auth');
 }
+
+/**
+ * Creates the table `os_pinserver` if it doesn't exist.
+ */
+function os_pinserver_auth_update_7001() {
+  $table = 'os_pinserver';
+  $table_exists = db_table_exists($table);
+  if ($table_exists) {
+    return;
+  }
+
+  $schema = os_pinserver_auth_schema();
+  if (!isset($schema[$table])) {
+    return;
+  }
+
+  // Creates the table.
+  db_create_table($table, $schema[$table]);
+}

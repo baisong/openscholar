@@ -26,8 +26,8 @@ function hwpi_basetheme_preprocess_html(&$vars) {
  * Adds mobile menu controls to menubar.
  */
 function hwpi_basetheme_page_alter(&$page) {
-  $page['menu_bar']['#sorted'] = false;
-  $page['menu_bar']['mobile'] = array(
+  $page['header_third']['#sorted'] = false;
+  $page['header_third']['mobile'] = array(
     '#theme' => 'links',
     '#attributes' => array(
       'class' => array('mobile-buttons'),
@@ -63,6 +63,19 @@ function hwpi_basetheme_page_alter(&$page) {
       )
     )
   );
+  
+  if (context_isset('context', 'os_public') && variable_get('enable_responsive', false)) {
+    $path = drupal_get_path('theme', 'hwpi_basetheme').'/css/';
+    drupal_add_css($path.'responsive.base.css');
+    drupal_add_css($path.'responsive.layout.css');
+    drupal_add_css($path.'responsive.nav.css');
+    drupal_add_css($path.'responsive.slideshow.css');
+    drupal_add_css($path.'responsive.widgets.css');
+
+    $theme = $GLOBALS['theme'];
+    $theme_path = drupal_get_path('theme', $theme).'/css/';
+    drupal_add_css($theme_path.'responsive.'.str_replace('hwpi_', '', $theme).'.css');
+  }
 }
 
 /**

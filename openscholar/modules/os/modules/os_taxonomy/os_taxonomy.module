@@ -65,6 +65,38 @@ function os_taxonomy_taxonomy_term_uri($term) {
  * Implements hook_views_query_alter().
  */
 function os_taxonomy_views_query_alter(&$view, &$query) {
+  if (!$path = os_taxonomy_in_taxonomy_term_context($view)) {
+    return;
+  }
+
+  $group_key = key($query->where);
+  $alias = $query->add_table('field_data_og_vocabulary');
+  $query->set_distinct();
+
+  $tid = str_replace('taxonomy/term/', '', $path);
+  $query->add_where($group_key, "$alias.og_vocabulary_target_id", $tid, '=');
+
+  if ($view_title = $view->get_title()) {
+    $term = taxonomy_term_load($tid);
+    $params = array(
+      '@term' => taxonomy_term_title($term),
+    );
+    $view->set_title(t('@term', $params));
+  }
+
+  os_taxonomy_activate_context($tid);
+}
+
+/**
+ * Verify the user is in a taxonomy term context.
+ *
+ * @param $view
+ *  The current view the user watching.
+ *
+ * @return mixed
+ *  The path of the term, i.e: taxonomy/term/1.
+ */
+function os_taxonomy_in_taxonomy_term_context($view) {
   $view_names = array();
   foreach (os_app_info() as $info) {
     if (empty($info['views tabs'])) {
@@ -124,22 +156,7 @@ function os_taxonomy_views_query_alter(&$view, &$query) {
     return;
   }
 
-  $group_key = key($query->where);
-  $alias = $query->add_table('field_data_og_vocabulary');
-  $query->set_distinct();
-
-  $tid = str_replace('taxonomy/term/', '', $path);
-  $query->add_where($group_key, "$alias.og_vocabulary_target_id", $tid, '=');
-
-  if ($view_title = $view->get_title()) {
-    $term = taxonomy_term_load($tid);
-    $params = array(
-      '@term' => taxonomy_term_title($term),
-    );
-    $view->set_title(t('@term', $params));
-  }
-
-  os_taxonomy_activate_context($tid);
+  return $path;
 }
 
 /**

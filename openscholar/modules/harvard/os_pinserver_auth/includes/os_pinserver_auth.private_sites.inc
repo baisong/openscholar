@@ -39,13 +39,17 @@ function _os_pinserver_auth_private_site_access($node, $op, $account){
 function _os_pinserver_auth_vsite_access_denied($vsite){
 
   //Get Privacy Setting
-  $wrapper = entity_metadata_wrapper('node', $vsite);
+  $wrapper = entity_metadata_wrapper('node', $vsite->group);
   if (! empty($wrapper->{VSITE_ACCESS_FIELD})) {
     switch ($wrapper->{VSITE_ACCESS_FIELD}->value()) {
       case OS_PINSERVER_INTRANET_ACCESS :
       case OS_PINSERVER_ACCESS :
         // Private group.
-        if (! user_access('administer group') && ! og_is_member('node', $vsite->nid, 'user', $account)) {
+        global $user;
+        if (! user_access('administer group') && ! og_is_member('node', $vsite->group->nid, 'user', $user) && !pinserver_check_system_settings()) {
+          //Load custom pinserver variables
+          $vsite->controllers->variable->init_overrides();
+
           // They are not a member, validate through pin.
           pinserver_redirect(array(
             'redirect' => url($_GET['q'], array(

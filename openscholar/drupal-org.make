@@ -26,6 +26,9 @@ projects[calendar][subdir] = "contrib"
 projects[calendar][version] = 3.4
 projects[calendar][patch][] = "http://raw.github.com/openscholar/openscholar/72d63ee3537c31505b7481975886ec13789feeb5/patches/calendar-fix-week-view-overflow.patch"
 
+projects[captcha][subdir] = "contrib"
+projects[captcha][version] = 1.0-beta2
+
 projects[colorbox][subdir] = "contrib"
 ; projects[colorbox][version] = 1.3
 projects[colorbox][version] = 2.4
@@ -36,7 +39,6 @@ projects[comment_sources][download][branch] = 7.x-2.x
 projects[comment_sources][download][revision] = a60c0282a1d8a7dbd8d0021c82b73919ada7034b
 projects[comment_sources][subdir] = "contrib"
 projects[comment_sources][type] = module
-; patches needed
 
 projects[context][subdir] = "contrib"
 projects[context][version] = 3.0-beta4
@@ -47,7 +49,7 @@ projects[contextual_annotation][subdir] = "contrib"
 projects[contextual_annotation][type] = module
 projects[contextual_annotation][download][type] = git
 projects[contextual_annotation][download][url] =  "http://git.drupal.org/project/contextual_annotation.git"
-; rbrandon needs to push updates to contrib
+; needs patches to contrib
 
 projects[ctools][subdir] = "contrib"
 projects[ctools][download][type] = git
@@ -100,10 +102,6 @@ projects[entityreference_prepopulate][download][type] = git
 projects[entityreference_prepopulate][download][revision] = e2c2811
 projects[entityreference_prepopulate][patch][] = "https://drupal.org/files/2007746-er-hide-access-5.patch"
 
-; projects[entity_dependency][subdir] = "contrib"
-; projects[entity_dependency][version] = 1.x-dev
-; projects[entity_dependency][patch][] = "http://drupal.org/files/entity-dependency-entityreference-1545278-2.patch"
-
 projects[elysia_cron][subdir] = "contrib"
 projects[elysia_cron][version] = 2.1
 
@@ -113,10 +111,6 @@ projects[eva][revision] = "6d92c27"
 
 projects[facetapi][subdir] = "contrib"
 projects[facetapi][version] = 1.1
-; 7.x-1.0+21 = 1.1
-;projects[facetapi][download][type] = git
-;projects[facetapi][download][branch] = 7.x-1.0
-;projects[facetapi][download][revision] = f7b7168
 projects[facetapi][patch][] = "http://drupal.org/files/2006704-facetapi-er-regroup-1.patch"
 
 projects[fb_social][subdir] = "contrib"
@@ -290,7 +284,7 @@ projects[pinserver][subdir] = "contrib"
 projects[pinserver][type] = module
 projects[pinserver][download][type] = git
 projects[pinserver][download][url] = "git://github.com/openscholar/pinserver.git"
-projects[pinserver][tag] = 7.x-3.1
+projects[pinserver][tag] = 7.x-3.2
 
 projects[purl][subdir] = "contrib"
 ;: projects[purl][version] = 1.0-beta1+11-dev
@@ -300,6 +294,9 @@ projects[purl][download][revision] = 469e8668
 projects[purl][patch][] = "http://drupal.org/files/1473502-purl-init-2_0.patch"
 projects[purl][patch][] = "http://drupal.org/files/1982198-purl-cache-set-1.patch"
 projects[purl][patch][] = "http://drupal.org/files/729862-9-purl-inbound-alter-modifies-q.patch"
+
+projects[registration][subdir] = "contrib"
+projects[registration][version] = 1.1
 
 projects[respondjs][subdir] = "contrib"
 projects[respondjs][version] = 1.1
@@ -368,7 +365,8 @@ projects[views_litepager][patch][] = "http://drupal.org/files/views_litepager-of
 
 projects[views_infinite_scroll][subdir] = "contrib"
 projects[views_infinite_scroll][version] = 1.1
-projects[views_infinite_scroll][patch][] = "http://drupal.org/files/views_infinite_scroll-vbo-1965288-2.patch"
+;projects[views_infinite_scroll][patch][] = "http://drupal.org/files/views_infinite_scroll-vbo-1965288-2.patch"
+;projects[views_infinite_scroll][patch][] = "http://localhost/patch/views_infinite_scroll-no_auto_scroll-2012910-1.patch"
 
 projects[wysiwyg][subdir] = "contrib"
 projects[wysiwyg][version] = 2.2
@@ -424,5 +422,4 @@ libraries[twitter-api-php][download][url] = "https://github.com/J7mbo/twitter-ap
 
 libraries[autopager][type] = "libraries"
 libraries[autopager][download][type] = "file"
-libraries[autopager][download][url] = "http://jquery-autopager.googlecode.com/files/jquery.autopager-1.0.0.js"
-libraries[autopager][patch][] = "http://drupal.org/files/jquery.autopager-permalink_state-1989144-2.patch"
+libraries[autopager][download][url] = "https://github.com/sagotsky/jquery-autopager/archive/v1.2.zip"

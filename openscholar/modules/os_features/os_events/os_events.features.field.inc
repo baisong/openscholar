@@ -302,6 +302,95 @@ function os_events_field_default_fields() {
     ),
   );
 
+  // Exported field: 'node-event-field_event_registration'.
+  $fields['node-event-field_event_registration'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_event_registration',
+      'foreign keys' => array(
+        'registration_type' => array(
+          'columns' => array(
+            'registration_type' => 'name',
+          ),
+          'table' => 'registration_type',
+        ),
+      ),
+      'indexes' => array(
+        'registration_type' => array(
+          0 => 'registration_type',
+        ),
+      ),
+      'locked' => '0',
+      'module' => 'registration',
+      'settings' => array(),
+      'translatable' => '0',
+      'type' => 'registration',
+    ),
+    'field_instance' => array(
+      'bundle' => 'event',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'module' => 'registration',
+          'settings' => array(),
+          'type' => 'registration_form',
+          'weight' => '10',
+        ),
+        'sidebar_teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+        'teaser' => array(
+          'label' => 'above',
+          'settings' => array(),
+          'type' => 'hidden',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'node',
+      'field_name' => 'field_event_registration',
+      'label' => 'Registration',
+      'required' => 0,
+      'settings' => array(
+        'default_registration_settings' => array(
+          'capacity' => '0',
+          'reminder' => array(
+            'reminder_settings' => array(
+              'reminder_date' => '',
+              'reminder_template' => '',
+            ),
+            'send_reminder' => 0,
+          ),
+          'scheduling' => array(
+            'close' => '',
+            'open' => '',
+          ),
+          'settings' => array(
+            'from_address' => 'admin@example.com',
+            'multiple_registrations' => 0,
+          ),
+          'status' => 1,
+        ),
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 0,
+        'module' => 'registration',
+        'settings' => array(),
+        'type' => 'registration_select',
+        'weight' => '34',
+      ),
+    ),
+  );
+
   // Exported field: 'node-event-field_upload'.
   $fields['node-event-field_upload'] = array(
     'field_config' => array(
@@ -424,12 +513,141 @@ function os_events_field_default_fields() {
     ),
   );
 
+  // Exported field: 'registration-event-field_department'.
+  $fields['registration-event-field_department'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_department',
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
+      ),
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
+      ),
+      'locked' => '0',
+      'module' => 'text',
+      'settings' => array(
+        'max_length' => '255',
+      ),
+      'translatable' => '0',
+      'type' => 'text',
+    ),
+    'field_instance' => array(
+      'bundle' => 'event_signup_simple',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => 1,
+        ),
+      ),
+      'entity_type' => 'registration',
+      'field_name' => 'field_department',
+      'label' => 'Department',
+      'required' => 0,
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'text',
+        'settings' => array(
+          'size' => '60',
+        ),
+        'type' => 'text_textfield',
+        'weight' => '2',
+      ),
+    ),
+  );
+
+  // Exported field: 'registration-event-field_full_name'.
+  $fields['registration-event-field_full_name'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_full_name',
+      'foreign keys' => array(
+        'format' => array(
+          'columns' => array(
+            'format' => 'format',
+          ),
+          'table' => 'filter_format',
+        ),
+      ),
+      'indexes' => array(
+        'format' => array(
+          0 => 'format',
+        ),
+      ),
+      'locked' => '0',
+      'module' => 'text',
+      'settings' => array(
+        'max_length' => '255',
+      ),
+      'translatable' => '0',
+      'type' => 'text',
+    ),
+    'field_instance' => array(
+      'bundle' => 'event_signup_simple',
+      'default_value' => NULL,
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'text',
+          'settings' => array(),
+          'type' => 'text_default',
+          'weight' => 0,
+        ),
+      ),
+      'entity_type' => 'registration',
+      'field_name' => 'field_full_name',
+      'label' => 'Full name',
+      'required' => 0,
+      'settings' => array(
+        'text_processing' => '0',
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'text',
+        'settings' => array(
+          'size' => '60',
+        ),
+        'type' => 'text_textfield',
+        'weight' => '1',
+      ),
+    ),
+  );
+
   // Translatables
   // Included for use with string extractors like potx.
   t('Attach Files');
   t('Body');
   t('Date');
+  t('Department');
+  t('Full name');
   t('Location');
+  t('Registration');
 
   return $fields;
 }

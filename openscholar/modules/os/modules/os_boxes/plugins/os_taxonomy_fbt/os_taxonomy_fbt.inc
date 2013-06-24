@@ -171,6 +171,10 @@ class os_taxonomy_fbt extends os_boxes_default {
    * Implements boxes_content::render().
    */
   public function render() {
+    if (module_exists('vsite') && !vsite_get_vsite()) {
+      return;
+    }
+
     $block = parent::render();
     if (empty($this->options['vocabulary'])) {
       $this->options['vocabulary'] = current(array_keys(self::get_all_vocabularies()));

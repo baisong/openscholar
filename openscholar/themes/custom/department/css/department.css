@@ -37,6 +37,7 @@ padding:1px 20px 20px;
 
 /**** BLOCK STYLES ****/
 #columns .block {background: url('../images/blockTitleBg.png') left top repeat-x;}
+.not-front #columns #content-column .block {background: none !important;}
 #columns .block .content {background: url('../images/blockBg.png') repeat-x center bottom;}
 #columns .region-content-top .block {padding-top:0;}
 
@@ -109,6 +110,7 @@ p span {
   
   .page-people .node-person.node-teaser ul.links.inline li a {display:none;}
   
+  h1.node-title {font-weight:normal;} 
  .at-panel.gpanel.content h1.node-title a {font-weight:normal;font-size: 13px;} 
   
  .block-boxes-os_taxonomy_fbt ul li {  
@@ -134,7 +136,7 @@ p span {
   .front h2.block-title {
   background: url('../images/blockIcon.png') 0 7px no-repeat;
   margin-left:8px;
-  padding-left: 34px;
+  padding-left: 37px;
   padding-top:11px;
   font-family: 'Oswald', arial;
    } 
@@ -212,7 +214,7 @@ p span {
  height:43px;
   }
 
-#menu-bar ul.menu {
+#menu-bar ul.nice-menu {
  margin-left:-4px;
  float:left;
  display:inline;

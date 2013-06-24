@@ -436,3 +436,52 @@ function os_files_update_7004(&$sb) {
     return t('Set @num files to the executable type.', array('@num' => $sb['fixed']));
   }
 }
+
+/**
+ * Runs through every file and fixes their spaces and file_usage information
+ */
+/*function os_files_update_7005(&$sb) {
+  module_load_include('inc', 'os_files', 'os_files.install_helpers');
+  $q = db_select('file_managed', 'fm')
+      ->fields('fm', array('fid'));
+
+  if (!isset($sb['progress'])) {
+    $sb['count'] = $q->countQuery()->execute()->fetchField();
+    $sb['progress'] = 0;
+    $sb['limit'] = 10;
+  }
+
+  $rs = $q->range($sb['progress'], $sb['limit'])->execute();
+
+  foreach ($rs as $obj) {
+    $fid = $obj->fid;
+    $file = file_load($fid);
+
+    // Update file_usage
+    $eids = _os_files_install_find_nodes($file);
+    db_delete('file_usage')
+      ->condition('fid', $fid)
+      ->condition('module', 'imagefield_crop', '<>')
+      ->condition('module', 'os_boxes', '<>')
+      ->condition('type', 'file', '<>')
+      ->execute();
+
+    foreach ($eids as $type => $ids) {
+      foreach ($ids as $d) {
+        file_usage_add($file, $d['module'], $type, $d['id']);
+      }
+    }
+
+    // Update group membership if necessary
+    if (module_exists('vsite') && $space = _os_files_install_find_new_space($file, $eids)) {
+      $file->{OG_AUDIENCE_FIELD}[LANGUAGE_NONE][0]['target_id'] = $space;
+      file_save($file);
+    }
+    $sb['progress']++;
+  }
+
+  $sb['#finished'] = $sb['progress']/$sb['count'];
+  if ($sb['#finished'] >= 1) {
+    return t('File usage has been corrected for all files.');
+  }
+} */

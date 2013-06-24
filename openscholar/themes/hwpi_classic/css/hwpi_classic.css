@@ -155,7 +155,7 @@ padding: 10px 0;
 .node-person .block-inner,
 .comment-wrapper {
 	border-top: 3px solid #4384C4;
-	margin-top:20px;
+	margin-top:15px;
 }
 
 .block-boxes block-boxes-os_sv_list_box,
@@ -210,6 +210,11 @@ padding: 10px 0;
 
 
 /** SLIDESHOW **/
+	
+.front #content-column .block.block-boxes-os_slideshow_box {
+	margin-top: 0;
+}
+	
 a.rslides_nav.next {
     background: url(../../hwpi_basetheme/images/ss_arrow.png) repeat scroll -20px 2px #4384C4;
 }

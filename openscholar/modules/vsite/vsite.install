@@ -16,6 +16,7 @@ function vsite_install() {
       'non-member',
       'vsite user',
       'vsite admin',
+      'content editor',
     );
 
     foreach ($vsite_roles as $name) {
@@ -341,4 +342,55 @@ function vsite_update_7008(&$ctx) {
   }
 
   return $output;
+}
+
+/**
+ * Adds new role 'content editor' to og roles.
+ */
+function vsite_update_7009() {
+  $node_info = module_invoke_all('vsite_og_node_type_info');
+  $group_bundles = array_keys($node_info, 'group');
+  foreach ($group_bundles as $group_bundle) {
+
+    // Adds the base vsite roles as OG roles
+    $vsite_roles = array(
+      'content editor',
+    );
+
+    foreach ($vsite_roles as $name) {
+      $role = og_role_create($name, 'node', 0, $group_bundle);
+      og_role_save($role);
+    }
+
+    $roles = og_roles($group_type = 'node', $bundle = $group_bundle);
+    // Sets OG-specific roles
+    foreach ($roles as $rid => $role) {
+      switch ($role) {
+        case 'content editor':
+          og_role_grant_permissions($rid, array(
+            'view users outside groups',
+            'unsubscribe',
+          ));
+          break;
+      }
+    }
+  }
+}
+
+/**
+ * Adds all permissions that basic users have to the content editor role too.
+ */
+function vsite_update_7010() {
+  $modules = array(
+    'os',
+    'os_comments',
+    'os_wysiwyg',
+  );
+
+  if (module_exists('os_slideshow')) {
+    $modules[] = 'os_slideshow';
+  }
+
+  $revert = array_fill_keys($modules, array('user_permission'));
+  features_revert($revert);
 }

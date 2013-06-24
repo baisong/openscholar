@@ -89,6 +89,9 @@ class os_boxes_site_info extends os_boxes_default {
   }
 
   function render() {
+    if (module_exists('vsite') && !vsite_get_vsite()) {
+      return;
+    }
     $block = parent::render();
 
     $anon_contact = variable_get('vsite_users_contact_form_anonymous', true);

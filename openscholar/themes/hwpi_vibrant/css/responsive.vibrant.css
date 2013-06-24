@@ -1,9 +1,6 @@
 @media (max-width: 1008px) {
-	
-	
+		
 	/* menus */
-	
-	
 .link-count-mobi-main a {
     background-color: #fff!important;
     color: #000!important;
@@ -40,14 +37,12 @@
 }
 .link-count-mobi-main a {
     background: url("../images/icon_menu.png") no-repeat scroll 15px center #FFFFFF !important;
-    margin-left: 15px;
 }
 .link-count-mobi-util a {
     background: url("../images/icon_plus.png") no-repeat scroll center center #F7F7F7 !important;
 }
 .link-count-mobi-search a {
     background: url("../images/icon_search.png") no-repeat scroll center center #4077AE !important;
-    margin-right: 15px;
 }
 .not-front .hg-container {
     padding-top: 65px !important;
@@ -62,14 +57,14 @@
 	background-color:#24527a!important;
 }
 #block-os-primary-menu li {
-    border-bottom: 1px solid #E8E8E8!important;
+    border-bottom: 1px solid #f4f4f4!important;
     border-top: none!important;
         display: block;
 }
 #menu-bar {
     background: none repeat scroll 0 0 #E6E6E3;
     margin: 0;
-    padding: 0 0 30px 0 !important;
+    padding:0 !important;
 }
 #boxes-box-os_pages_section_nav ul.menu {
     margin-left: 0!important;
@@ -83,18 +78,28 @@
 ul.menu {
     margin-left: 15px !important;
 }
-
 #menu-bar ul.nice-menu li {
     background-color: #FFFFFF !important;
     margin-right: 30px !important;
 }
-#menu-bar ul.menu ul ul {
+#menu-bar ul.nice-menu ul {
     background: none repeat scroll 0 0 #80282C!important;
 }
 #menu-bar nav {
     background: none repeat scroll 0 0 #E8E8E8!important;
     border-radius: 0 0 0 0;
     box-shadow: 0 ;
+}
+.region-header-third #block-os-secondary-menu.opened {
+    background-color: #F7F7F7!important;
+}
+.region-header-third #block-os-secondary-menu li{
+  border-bottom: 1px solid #DEDEDC!important;
+    border-top: medium none!important;
+    margin-left:0!important;
+}
+.region-header-third ul.nice-menu a {
+    color: #3A72AB!important;
 }
 .mobile-buttons a {
     font: bold 16px arial,sans-serif !important;
@@ -104,11 +109,8 @@ ul.menu {
     margin: -40px 0 35px!important;
 }
 /* column layouts */
-
-
-.one-sidebar.sidebar-second .region-sidebar-second {
-    padding-top: 65px!important;
-
+.page-node #content-column .content-inner {
+    padding: 0 2% !important;
 }
 
 .two-sidebars .region-sidebar-second {
@@ -117,13 +119,8 @@ ul.menu {
 }
 #menu-bar ul.nice-menu .menuparent ul li a {
     background: none repeat scroll 0 0 #24527A !important;
-
 }
-
-
 /* calendar arrows */
-
-
 .one-sidebar #main-content .view .date-nav-wrapper .date-prev {
     right: 90%;
 }

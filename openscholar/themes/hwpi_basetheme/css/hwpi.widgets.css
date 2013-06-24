@@ -454,10 +454,6 @@ table td.mini .mini-day-on a {
 }
 
 /* NEW Slideshow Dan */
-.block-boxes-os_slideshow_box .block-title {
-  display: none;
-}
-
 
 .block-boxes-os_slideshow_box {
   position: relative;

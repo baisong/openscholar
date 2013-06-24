@@ -104,10 +104,16 @@ function os_update_7009() {
 }
 
 /**
- * June 20 updates - Enable views_infinite_scroll and views_litepager modules, retire quinn theme
+ * June 20 updates - Enable views_infinite_scroll and views_litepager modules, retire quinn theme, 
+ * revert infinite scroll views, add mollom to event registration forms
  */
 function os_update_7010() {
+  //enable infinite scrolling and revert the features that use it
   module_enable(array('views_infinite_scroll', 'views_litepager'));
+  features_revert(array_fill_keys(array('os_faq','os_links','os_news','os_profiles'), array('view')));
+
+  //enable mollom on event signup pages
+  _os_update_event_registration_mollom();
   
   //quinn and its flavors -> eloquent
   $flavors = array(
@@ -120,9 +126,9 @@ function os_update_7010() {
     'quinn_orange_palatino' => 'outsidesidebars_orangepalatino',
     'quinn_sage' => 'outsidesidebars_sage',
     'quinn_white' => 'outsidesidebars_white',
-    'theme_04_dark_grey' => 'outsidesidebars_darkgrey',
-    'theme_04_sage' => 'outsidesidebars_sage',
-    'default' => 'outsidebars_grey',
+    'theme_04_dark_grey' => 'outsidesidebars_grey',
+    'theme_04_sage' => 'outsidesidebars_grey',
+    'default' => 'outsidesidebars_grey',
   );
   
   $query = db_select('spaces_overrides', 'theme');
@@ -190,5 +196,41 @@ function os_update_7012() {
     foreach (array(DRUPAL_ANONYMOUS_RID, DRUPAL_AUTHENTICATED_RID) as $rid) {
       user_role_grant_permissions($rid, array('access resource file'));
     }
+  }
+}
+
+
+/**
+ * @function _os_update_event_registration_mollom
+ * 
+ * Configures mollom to put a captcha on event signups
+ */
+function _os_update_event_registration_mollom() {
+  if (module_exists('mollom')) {
+    $mollom_form = array(
+      'form_id' => 'registration_form',
+      'mode' => '1',
+      'checks' => array('spam'),
+      'enabled_fields' => array('field_department][und][0][value','field_full_name][und][0][value'),
+      'strictness' => 'normal',
+      'discard' => '1',
+      'moderation' => 0,
+      'entity' => 'registration',
+      'bundle' => 'event_signup_simple',
+      'module' => 'os_events',
+      'title' => 'Registration form',
+      'elements' => array(
+        'field_department][und][0][value' => 'Department',
+        'field_full_name][und][0][value' => 'Full Name',
+      ),
+      'mapping' => array(
+        'author_email' => 'anon_email',
+        'post_id' => 'registration_id',
+      ),
+      'bypass access' => array(),
+      'mail ids' => array(),
+    );
+    
+    mollom_form_save($mollom_form);
   }
 }

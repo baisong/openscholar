@@ -38,6 +38,8 @@ function _os_add_infinite_scroll($name, $next_link = 'li.pager-next>a', $content
        'autoLoad' => TRUE,
        'loading_image' => $img,
        'pager' => '#content ul.pager',
+       'noAutoScroll' => 4,
+       'link_prev' => '#content li.pager-previous>a',
      ),   
    );
   
@@ -47,4 +49,6 @@ function _os_add_infinite_scroll($name, $next_link = 'li.pager-next>a', $content
   drupal_add_js(array('autopager'=>$settings), 'setting');
   drupal_add_js(drupal_get_path('module', 'os') . '/includes/os_infinite_scroll.js');
   drupal_add_js($lib . '/jquery.autopager-1.0.0.js');
+  drupal_add_css(libraries_get_path('autopager') .'/autopager.css');
+  
 }

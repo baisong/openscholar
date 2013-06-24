@@ -7,6 +7,7 @@
  */
 
 use GitWrapper\GitWrapper;
+use GitWrapper\GitException;
 
 /**
  * Implements hook_menu().
@@ -43,7 +44,7 @@ function cp_appearance_menu(){
   $items['cp/appearance/add-subtheme'] = array(
     'title' => 'Add subtheme',
     'page callback' => 'cp_appearance_select_method',
-    'access arguments' => array('manage subtheme'),
+    'access callback' => 'cp_appearance_sub_theme_access',
     'type' => MENU_LOCAL_ACTION,
   );
 
@@ -55,11 +56,20 @@ function cp_appearance_menu(){
       'title' => $info->name,
       'page callback' => 'drupal_get_form',
       'page arguments' => array($form_id, 3),
-      'access arguments' => array('manage subtheme'),
+      'access callback' => 'cp_appearance_sub_theme_access',
     );
   }
 
   return $items;
+}
+
+/**
+ * Access callback.
+ */
+function cp_appearance_sub_theme_access() {
+  if (module_exists('vsite') && $vsite = vsite_get_vsite()) {
+    return og_user_access('node', $vsite->group->nid, 'manage subtheme', NULL, FALSE, TRUE);
+  }
 }
 
 /**
@@ -191,7 +201,7 @@ function cp_appearance_theme_picker_form_validate($form, &$form_state){
 
 /**
  * Processes all the flavors a theme has.
- * 
+ *
  * @param array $theme_flavors
  *  	List of flavors used by this theme
  * @param array $info
@@ -318,15 +328,16 @@ function cp_appearance_swap_screenshot($form, &$state){
 
 
 function cp_appearance_cp_settings() {
-  $setting['disable_responsive'] = array(
+  $setting['enable_responsive'] = array(
     'group' => array(
       '#title' => t('Responsive'),
       '#id' => 'responsive',
     ),
     'form' => array(
       '#type' => 'checkbox',
-      '#default_value' => variable_get('disable_responsive', false),
-      '#title' => t('Disable responsive behaviors'),
+
+      '#default_value' => variable_get('enable_responsive', false),
+      '#title' => t('Enable responsive behaviors - EXPERIMENTAL'),
       '#description' => t('Responsive behaviors will change the layout of your page to fit the screens of smaller devices, such
         as phones or tablets. Disabling this will prevent the layout from changing, but could make using your site more difficult
         on smaller devices.'),
@@ -336,16 +347,6 @@ function cp_appearance_cp_settings() {
   return $setting;
 }
 
-function cp_appearance_page_alter(&$page) {
-  if (context_isset('context', 'os_public') && !variable_get('disable_responsive', false)) {
-    $path = drupal_get_path('theme', 'hwpi_basetheme').'/css/';
-    drupal_add_css($path.'responsive.base.css');
-    drupal_add_css($path.'responsive.layout.css');
-    drupal_add_css($path.'responsive.nav.css');
-    drupal_add_css($path.'responsive.slideshow.css');
-    drupal_add_css($path.'responsive.widgets.css');
-  }
-}
 
 // Subtheme.
 
@@ -361,9 +362,9 @@ function cp_appearance_admin_paths() {
 }
 
 /**
- * Implements hook_permission().
+ * Implements hook_og_permission().
  */
-function cp_appearance_permission() {
+function cp_appearance_og_permission() {
   return array(
     'manage subtheme' => array(
       'title' => t('Add subtheme'),
@@ -379,7 +380,8 @@ function theme_cp_appearance_add_subtheme_list($variables) {
   $types = $variables['types'];
 
   if ($types) {
-    $output = '<ul class="admin-list">';
+    $output = '<h4>Download the <a target="_blank" href="https://github.com/openscholar/starterkit">Subtheme Starter Kit</a> to begin developing your custom theme.</h4>';
+    $output .= '<ul class="admin-list">';
     foreach ($types as $type => $info) {
       $output .= '<li class="clearfix">';
       $output .= '<span class="label">' . l($info->name, 'cp/appearance/add-subtheme/' . $type) . '</span>';
@@ -389,7 +391,7 @@ function theme_cp_appearance_add_subtheme_list($variables) {
     $output .= '</ul>';
   }
   else {
-    $output = '<p>' . t('There is no subtheme types. Go to the <a href="@url">subtheme types create page</a> to add a new subtheme type.', array('@url' => url('admin/structure/subtheme'))) . '</p>';
+    $output = '<p>' . t('There are no subtheme types. Go to the <a href="@url">subtheme types create page</a> to add a new subtheme type.', array('@url' => url('admin/structure/subtheme'))) . '</p>';
   }
 
   return $output;
@@ -487,14 +489,14 @@ function cp_appearance_validate_subtheme($info, $form_element_name, $in_form = T
 
   if (empty($info['module'])) {
     if ($in_form) {
-      form_set_error($form_element_name, t('The theme you uploaded is not valid: theme name to be based on is missing.'));
+      form_set_error($form_element_name, t('The theme you uploaded is not valid.  `module` directive missing.'));
     }
 
     return FALSE;
   }
   else if (!in_array($info['module'], array_keys($themes))) {
     if ($in_form) {
-      form_set_error($form_element_name, t('The theme you uploaded is not valid: the base theme is not listed in the theme list.'));
+      form_set_error($form_element_name, t('The theme you uploaded is not valid.  `module` refers to a theme that does not exist.'));
     }
 
     return FALSE;
@@ -529,7 +531,7 @@ function cp_appearance_manage_base_submit($form, &$form_state) {
 /**
  * Adding a theme - git.
  */
-function cp_appearance_manage_git($form, $form_state, $type) {
+function cp_appearance_manage_git($form, &$form_state, $type) {
   // Adding the git library.
   require_once libraries_get_path('git') . '/autoload.php';
 
@@ -538,91 +540,107 @@ function cp_appearance_manage_git($form, $form_state, $type) {
   $form['repository'] = array(
     '#type' => 'textfield',
     '#title' => t('Git repository address'),
-    '#description' => t('Enter the repository address'),
     '#required' => TRUE,
-
     '#ajax' => array(
       'callback' => 'cp_appearance_git_method_get_ajax_branches',
-      'wrapper' => 'branches',
+      'wrapper' => 'branches-wrapper',
       'method' => 'replace',
+      'keypress' => TRUE,
     ),
   );
 
-  $repository_address = !empty($form_state['values']['repository']) ? $form_state['values']['repository'] : 0;
+  $branches = array();
 
-  $form['branch'] = array(
-    '#type' => 'select',
-    '#title' => t('Branch'),
-    '#description' => t('Enter the branch of the git repository'),
-    '#prefix' => '<div id="branches">',
-    '#suffix' => '</div>',
-    '#options' => array(
-      '---' => t(' --- Select a branch --- '),
-    ),
-
-    '#ajax' => array(
-      'callback' => 'cp_appearance_git_method_get_valid_branches',
-      'wrapper' => 'branches',
-    ),
-  );
-
-  if ($repository_address) {
+  if ($repository_address = !empty($form_state['values']['repository']) ? $form_state['values']['repository'] : FALSE) {
     $wrapper = new GitWrapper();
     $wrapper->setPrivateKey('.');
 
-    if (empty($form_state['#git_path'])) {
-      $path = drupal_realpath('public://') . '/git/' . time();
-      $form_state['#git_path'] = $path;
+    $path = variable_get('file_public_path', conf_path() . '/files') . '/subtheme/' . $repository_address;
 
-      // Clone the repo.
-      $clone = TRUE;
-    }
-    else {
-      $path = $form_state['#git_path'];
-      // Don't clone the repo. We already have it.
-      $clone = FALSE;
+    // @todo: Remove the github hardcoding.
+    $path = str_replace(array('http://', 'https://', '.git', 'git@github.com:'), '', $path);
+
+    if (!file_exists($path)) {
+      drupal_mkdir($path, NULL, TRUE);
     }
 
     $git = $wrapper->workingCopy($path);
 
-    // This will let us know if the repo. was cloned and will not clone the
-    // repo. every time the user change the branch.
-    if ($clone) {
-      $git->clone($repository_address);
-    }
-
-    $branches = array();
-
-    foreach ($git->getBranches()->remote() as $branch) {
-      if (strpos($branch, ' -> ') !== FALSE) {
-        // A branch named "origin/HEAD  -> xyz" is provided by the class, we
-        // don't need him.
-        continue;
+    if (!$git->isCloned()) {
+      try {
+        $git->clone($repository_address);
+        $git->setCloned(TRUE);
       }
-
-      $branches[str_replace(" ", "_", $branch)] = $branch;
+      catch (GitException $e) {
+        // Can't clone the repo.
+        drupal_set_message(t('Could not clone @repository, error @error', array('@repository' => $repository_address, '@error' => $e->getMessage(), 'warning')));
+      }
     }
 
-    $form['branch']['#options'] = array('---' => t(' --- Select a branch --- ')) + $branches;
+    $form['path'] = array(
+      '#type' => 'value',
+      '#value' => $path,
+    );
+
+    if ($git->isCloned()) {
+      try {
+        foreach ($git->getBranches()->remote() as $branch) {
+          if (strpos($branch, ' -> ') !== FALSE) {
+            // A branch named "origin/HEAD  -> xyz" is provided by the class, we
+            // don't need it.
+            continue;
+          }
+          $branches[str_replace(' ', '_', $branch)] = $branch;
+        }
+      }
+      catch (GitException $e) {
+      }
+    }
 
     $subtheme = new SubTheme();
     $subtheme->path = $path;
     $form_state['subtheme'] = $subtheme;
   }
 
-  $repository_branch = !empty($form_state['values']['branch']) ? $form_state['values']['branch'] : 0;
-
-  if ($repository_branch != '---') {
-    $git->checkout($repository_branch);
-  }
-
-  $form['actions'] = array(
-    '#type' => 'actions',
-    'submit' => array(
-      '#type' => 'submit',
-      '#value' => t('Save'),
-    ),
+  $form['branches_wrapper'] = array(
+    '#prefix' => '<div id="branches-wrapper">',
+    '#suffix' => '</div>',
   );
+
+  $valid_repo = FALSE;
+
+  if ($branches) {
+    $form['branches_wrapper']['branch'] = array(
+      '#type' => 'select',
+      '#title' => t('Branch'),
+      '#description' => t('Enter the branch of the git repository'),
+      '#options' => $branches,
+      '#required' => TRUE,
+    );
+
+    $valid_repo = TRUE;
+  }
+  elseif (!$branches && $repository_address) {
+    $form['branches_wrapper']['branch'] = array('#markup' => '<div id="branches">' .  t('Git repository is wrong.') . '</div>');
+  }
+  if ($valid_repo) {
+    $form['branches_wrapper']['actions'] = array(
+      '#type' => 'actions',
+      'submit' => array(
+        '#type' => 'submit',
+        '#value' => t('Save'),
+      ),
+    );
+  }
+  else {
+    // Place holder for Ajax.
+    $form['branches_wrapper']['actions'] = array(
+      '#type' => 'actions',
+      'submit' => array(
+        '#markup' => '<a href="#">' . t('Fetch branches') . '</a>',
+      ),
+    );
+  }
 
   return $form;
 }
@@ -631,23 +649,39 @@ function cp_appearance_manage_git($form, $form_state, $type) {
  * Return piece of the form for AJAX rendering.
  */
 function cp_appearance_git_method_get_ajax_branches($form, $form_state) {
-  return $form['branch'];
-}
-
-/**
- * Return piece of the form for AJAX rendering.
- */
-function cp_appearance_git_method_get_valid_branches($form, $form_state) {
-  return $form['branch'];
+  return $form['branches_wrapper'];
 }
 
 /**
  * Validate handler - verify the user selected a branch.
  */
 function cp_appearance_manage_git_validate($form, $form_state) {
-  if ($form_state['values']['branch'] == '---') {
-    form_set_error('branch', t('Select a branch.'));
+  if (empty($form_state['values']['branch'])) {
     return;
+  }
+
+  require_once libraries_get_path('git') . '/autoload.php';
+
+  $repository = $form_state['values']['repository'];
+  $branch = $form_state['values']['branch'];
+
+  $path = $form_state['values']['path'];
+
+  $wrapper = new GitWrapper();
+  $wrapper->setPrivateKey('.');
+  $git = $wrapper->workingCopy($path);
+
+  // We pull, in case the user wants to reload a subtheme.
+  try {
+    $git->checkout($branch, array('t' => TRUE));
+  }
+  catch (GitException $e) {
+  }
+
+  try {
+    $git->pull();
+  }
+  catch (GitException $e) {
   }
 
   if (empty($form_state['subtheme'])) {
@@ -677,10 +711,6 @@ function cp_appearance_manage_git_submit($form, &$form_state) {
   // Parse the info.
   $info = $file->parseInfo();
 
-  // When cloning via git the path os not relative. Remove the DRUPAL_ROOT from
-  // the path.
-  $file->path = str_replace(DRUPAL_ROOT . '/', '', $file->path);
-
   // Save the path of the extracted theme for later.
   $flavors[$info['theme name']] = array(
     'path' => $file->path,
@@ -691,6 +721,7 @@ function cp_appearance_manage_git_submit($form, &$form_state) {
 
   $form_state['redirect'] = 'cp/appearance';
 }
+
 
 /**
  * Search of the flavors uploaded to the vsite.
