@@ -70,6 +70,17 @@ function vsite_node_form_after_build($form) {
   if (!module_exists('vsite_domain')) {
     return;
   }
+  // Only continues if we have a node object.
+  if (isset($form['#node'])) {
+    return;
+  }
+  // Only continues to modify the node form for group content, not group types.
+  // We don't want to modify alias values on vsite nodes.
+  $node = $form['#node'];
+  if (!og_is_group_content_type('node', $node->type) || og_is_group_type('node', $node->type)) {
+    return;
+  }
+
   // Prepares a field prefix to store this site's path.
   $field_prefix = rtrim(url('<front>', array('absolute' => TRUE)), '/');
   // Adds the prefix to the custom alias field on the node form.
