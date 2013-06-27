@@ -310,6 +310,13 @@ function vsite_spaces_registry_alter(&$registry){
  * @return
  */
 function vsite_vsite_exists_access($vsites = array()){
+  global $base_url;
+  $purl_base_domain = variable_get('purl_base_domain', '');
+  if ($base_url != $purl_base_domain) {
+    drupal_set_message(t('You may not create sites at this domain.'), 'error');
+    return FALSE;
+  }
+
   global $user;
 
   // load user's vsites. anon (uid 0) has no vsites
