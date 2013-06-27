@@ -39,16 +39,30 @@ function vsite_register_form($form, &$state) {
     '#attached' => array('js' => array(drupal_get_path('module', 'vsite_register') . '/vsite_register.js')),
   );
 
-  $group_types = og_get_all_group_bundle();
-  $default_bundle = variable_get('os_default_group_bundle', 'personal');
+  // Gets the available vsite bundles as options for the form.
   $bundles = array();
+  $group_types = og_get_all_group_bundle();
+  $default_subsite_bundles = array('personal', 'project');
   foreach ($group_types['node'] as $bundle => $label) {
-    if (user_access("create {$bundle} content") && (!isset($parent) || in_array($bundle, variable_get('subsite_bundles', array('personal', 'project'))))) {
+    // Verifies this user has access to create this node type.
+    $user_access = user_access("create $bundle content");
+    // Verifies this node type either has a parent, or doesn't need a parent.
+    $subsite_bundles = variable_get('subsite_bundles', $default_subsite_bundles);
+    $hierarchy_valid = (bool) (!isset($parent) || in_array($bundle, $subsite_bundles));
+    // Restricts options to only valid vsite types that the user may create.
+    if ($user_access && $hierarchy_valid) {
       $bundles[$bundle] = $label;
     }
   }
+
+  // Sets the form bundle option to the default value.
+  $default_bundle = 'personal';
+  $default_bundle = variable_get('os_default_group_bundle', $default_bundle);
+  // If the default bundle is not available among the available options,
+  // Instead default to the first available bundle in the options list.
   if (!isset($bundles[$default_bundle])) {
-    $default_bundle = current($bundles);
+    // Gets the bundle machine name from the options array keys.
+    $default_bundle = current(array_keys($bundles));
   }
 
   $form['bundle'] = array(
@@ -59,10 +73,13 @@ function vsite_register_form($form, &$state) {
     '#default_value' => $default_bundle,
   );
 
+  // If there are fewer than 2 available group node types for this user,
+  // then hides the select option from the form and uses the default value.
   if (count($bundles) <= 1) {
     $form['bundle']['#type'] = 'value';
     $form['bundle']['#value'] = $default_bundle;
   }
+  // Otherwise adds AJAX callback to update preset value when bundle changes.
   else {
     $form['bundle']['#ajax'] = array(
       'event' => 'change',
@@ -72,14 +89,19 @@ function vsite_register_form($form, &$state) {
     );
   }
 
-  $selected_bundle = isset($state['values']['bundle']) ? $state['values']['bundle'] : $default_bundle;
+  if (isset($state['values']['bundle'])) {
+    $selected_bundle =  $state['values']['bundle'];
+  }
+  else {
+    $selected_bundle = $default_bundle;
+  }
 
   // Gets enabled presets and load their titles.
   $enabled_presets = array_filter(variable_get('os_enabled_spaces_presets', array()));
   $presets = spaces_preset_load();
   foreach ($enabled_presets as $key => $value) {
     $enabled_presets[$key] = $presets[$key]->title;
-    // Remove presets that don't go with this bundle.
+    // Removes presets that don't go with this bundle.
     if (isset($presets[$key]->value['bundles']) && !in_array($selected_bundle, $presets[$key]->value['bundles'])) {
       unset($enabled_presets[$key]);
     }
@@ -89,13 +111,15 @@ function vsite_register_form($form, &$state) {
   $form['preset'] = array(
     '#prefix' => '<div id="preset-wrapper">',
     '#suffix' => '</div>',
-    '#title' => t('Initial Setup'),
+    '#title' => t('Initial setup'),
     '#type' => 'select',
     '#required' => TRUE,
     '#options' => $enabled_presets,
     '#default_value' => (isset($enabled_presets[$default_preset])) ? $default_preset : current(array_keys($enabled_presets)),
   );
 
+  // If there are fewer than 2 enabled presets for this group node type,
+  // then hides the select option from the form and uses the default value.
   if (count($enabled_presets) <= 1) {
     $form['preset']['#type'] = 'value';
     $form['preset']['#value'] = $form['preset']['#default_value'];

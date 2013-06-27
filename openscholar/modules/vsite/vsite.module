@@ -1880,8 +1880,8 @@ function vsite_user_autocomplete($string = '') {
 function vsite_og_tasks_info($entity_type, $entity) {
   $tasks = array();
 
-  $tasks['AboutSection'] = new vsiteTaskAboutSection($entity_type, $entity);
-  $tasks['NewsEventsSection'] = new vsiteTaskNewsEventsSection($entity_type, $entity);
+//   $tasks['AboutSection'] = new vsiteTaskAboutSection($entity_type, $entity);
+//   $tasks['NewsEventsSection'] = new vsiteTaskNewsEventsSection($entity_type, $entity);
 
   return $tasks;
 }
