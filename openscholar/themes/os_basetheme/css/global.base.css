@@ -456,11 +456,6 @@ ul ul ul ul {
   display: none;
 }
 
-/* Commenting this out for now, until its purpose can be determined. 
-.node-event .node-content {
-  padding-top: 30px;
-}
-*/
 .view-os-events.view-id-os_events .attachment-before {
   position: absolute;
   top: -10px;

@@ -49,6 +49,7 @@
     width:100%;
 }
 /* Dropdown menu */
+
 #block-os-primary-menu a {
     color: #000000 !important;
 }
@@ -61,10 +62,11 @@
     border-top: none!important;
         display: block;
 }
+
 #menu-bar {
-    background: none repeat scroll 0 0 #E6E6E3;
-    margin: 0;
-    padding:0 !important;
+    background: none repeat scroll 0 0 #E8E8E8;
+    min-height: 39px;
+    padding: 0 15px !important;
 }
 #boxes-box-os_pages_section_nav ul.menu {
     margin-left: 0!important;
@@ -103,6 +105,11 @@ ul.menu {
 }
 .mobile-buttons a {
     font: bold 16px arial,sans-serif !important;
+}
+#layout_16_9_side .hero-copy {
+    left: 50px!important;
+    position: relative;
+
 }
 /*Breadcrumb*/
 .node-type-page .breadcrumb, .breadcrumb {

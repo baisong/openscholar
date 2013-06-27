@@ -13,6 +13,9 @@
 
 }
 /*Dropdown menu*/
+#menu-bar {
+    background: none!important;
+}
 #block-os-primary-menu{
     background: none repeat scroll 0 0 #A23338;
 
