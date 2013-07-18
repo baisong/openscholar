@@ -234,3 +234,12 @@ function _os_update_event_registration_mollom() {
     mollom_form_save($mollom_form);
   }
 }
+
+/**
+ * Ensures authenticated users can use user/autocomplete ajax callback.
+ */
+function os_update_7013() {
+  $rid = DRUPAL_AUTHENTICATED_RID;
+  $permissions = array('view user profiles');
+  user_role_grant_permissions($rid, $permissions);
+}
