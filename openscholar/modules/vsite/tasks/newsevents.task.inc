@@ -5,23 +5,22 @@
  * File for including the task class creating the 'news & events' section on a new site.
  */
 class vsiteTaskNewsEventsSection extends vsite_task {
-
-  function __construct($entity_type, $entity){
+  function __construct($entity_type, $entity) {
     $title = 'Create the news & events section for a site.';
     $description = 'The site will get an menu entry in the main menu linking to a news & events section.';
 
     parent::__construct($entity_type, $entity, $title, $description);
   }
 
-  function execute(){
-    // Setup Enviroment.
+  function execute() {
+    // Sets up environment.
     $this->activate_vsite();
 
-    //Create the main about page with menu item in the primary menu and page submenu.
-    $ne_node = $this->add_node(array(
+    // Adds a page node with menu item in the primary menu and a page sub-menu.
+    $news_events_page = array(
       'type' => 'page',
       'title' => 'News & Events',
-      // Create book submenu.
+      // Creates book sub-menu.
       'book' => array(
         'original_bid' => 0,
         'menu_name' => '',
@@ -34,9 +33,9 @@ class vsiteTaskNewsEventsSection extends vsite_task {
         'weight' => 0,
         'module' => 'book',
         'options' => array(),
-        'parent_depth_limit' => 8
+        'parent_depth_limit' => 8,
       ),
-      //Add 'news & events' to the main menu.
+      // Add the node to the primary menu.
       'os_menu' => array(
         'enabled' => 1,
         'mlid' => 0,
@@ -52,41 +51,45 @@ class vsiteTaskNewsEventsSection extends vsite_task {
         'parent' => 'primary-menu',
         'weight' => 0,
         'new_window' => '',
-        'dirty' => 1
+        'dirty' => 1,
       ),
-    ));
-
-    ctools_include('menu','os');
-    $ne_mlid = vsite_menu_get_link_path('primary-menu', 'node/'.$ne_node->nid);
-
-    $news_item = array(
-      'link_path' => 'news',
-      'menu_name' => 'primary-menu',
-      'link_title' => 'News',
-      'options' => array(),
-      'plid' => $ne_mlid,
     );
-    os_menu_link_save($news_item);
+    $node = $this->add_node($news_events_page);
 
-    $upcoming_events_item = array(
-      'link_path' => 'calendar/upcoming',
-      'menu_name' => 'primary-menu',
-      'link_title' => 'Upcoming Events',
-      'options' => array(),
-      'plid' => $ne_mlid,
+    // Creates new child menu links:
+    // First, finds the menu link ID of the vsite node.
+    ctools_include('menu', 'os');
+    $node_path = "node/$node->nid";
+    $mlid = vsite_menu_get_link_path('primary-menu', $node_path);
+    $items = array(
+      0 => array(
+        'link_path' => 'news',
+        'menu_name' => 'primary-menu',
+        'link_title' => 'News',
+        'options' => array(),
+        'plid' => $mlid,
+      ),
+      1 => array(
+        'link_path' => 'calendar/upcoming',
+        'menu_name' => 'primary-menu',
+        'link_title' => 'Upcoming Events',
+        'options' => array(),
+        'plid' => $mlid,
+      ),
+      2 => array(
+        'link_path' => 'calendar',
+        'menu_name' => 'primary-menu',
+        'link_title' => 'Calendar',
+        'options' => array(),
+        'plid' => $mlid,
+      ),
     );
-    os_menu_link_save($upcoming_events_item);
+    foreach ($items as $item) {
+      os_menu_link_save($item);
+    }
 
-    $upcoming_events_item = array(
-      'link_path' => 'calendar',
-      'menu_name' => 'primary-menu',
-      'link_title' => 'Calendar',
-      'options' => array(),
-      'plid' => $ne_mlid,
-    );
-    os_menu_link_save($upcoming_events_item);
-
-    // Tear Down Enviroment.
+    // Tears down enviroment.
     $this->deactivate_vsite();
   }
 }
+

@@ -5,24 +5,26 @@
  * File for including the task class creating the 'About' section on a new site.
  */
 class vsiteTaskAboutSection extends vsite_task {
-
-  function __construct($entity_type, $entity){
+  function __construct($entity_type, $entity) {
     $title = 'Create the about section for a site.';
     $description = 'The site will get an menu entry in the main menu linking to an about section.';
 
     parent::__construct($entity_type, $entity, $title, $description);
   }
 
-  function execute(){
+  function execute() {
 
     // Setup Enviroment.
     $this->activate_vsite();
 
-    //Create the main about page with menu item in the primary menu and page submenu.
-    $about_node = $this->add_node(array(
+    // Adds the "About" page.
+    // Creates a page node with menu item in the primary menu and a sub-menu.
+    $title = t('About');
+    $body = '<p>' . t('Check back soon.') . '</p>';
+    $about_page = array(
       'type' => 'page',
-      'title' => 'About',
-      // Create book submenu.
+      'title' => $title,
+      // Creates book sub-menu.
       'book' => array(
         'original_bid' => 0,
         'menu_name' => '',
@@ -35,9 +37,9 @@ class vsiteTaskAboutSection extends vsite_task {
         'weight' => 0,
         'module' => 'book',
         'options' => array(),
-        'parent_depth_limit' => 8
+        'parent_depth_limit' => 8,
       ),
-      //Add 'About' to the main menu.
+      // Adds 'About' page to the primary menu.
       'os_menu' => array(
         'enabled' => 1,
         'mlid' => 0,
@@ -53,50 +55,58 @@ class vsiteTaskAboutSection extends vsite_task {
         'parent' => 'primary-menu',
         'weight' => 0,
         'new_window' => '',
-        'dirty' => 1
+        'dirty' => 1,
       ),
-      //Default body text.
+      // Adds default body text.
       'body' => array(
         'und' => array(
           '0' => array(
             'summary' => '',
-            'value' => '<p>Check back soon.</p>',
-            'format' => 'filtered_html'
-          )
-        )
-      )
-    ));
+            'value' => $body,
+            'format' => 'filtered_html',
+          ),
+        ),
+      ),
+    );
+    $node = $this->add_node($about_page);
 
-   $this->add_node(array(
+    // Adds the "Contact" page.
+    // Creates a page node with menu item in the primary menu and a sub-menu.
+    $title = t('Contact');
+    $body = '<h2>' . t('Address') . '</h2>' . '<p>' . implode('&nbsp;<br/>', array(t('Coming Soon'), t('The University'), t('1800 Location Street'), t('Cambridge, MA 02138'))) . '</p>'; . '<p>' . implode('&nbsp;<br/>', array(t('Main Phone: xxx-xxx-xxxx'), t('Main Fax: xxx-xxx-xxxx'))) . '</p>';
+    $contact_page = array(
       'type' => 'page',
-      'title' => 'Contact',
-      'book' => Array(
+      'title' => $title,
+      // Creates book sub-menu.
+      'book' => array(
         'original_bid' => 0,
-        'menu_name' => $about_node->book['menu_name'],
+        'menu_name' => $node->book['menu_name'],
         'nid' => 'new',
-        'bid' => $about_node->book['bid'],
+        'bid' => $node->book['bid'],
         'router_path' => 'node/%',
-        'plid' => $about_node->nid,
+        'plid' => $node->nid,
         'mlid' => 0,
         'has_children' => 0,
         'weight' => 0,
         'module' => 'book',
-        'options' => Array(),
-        'parent_depth_limit' => 8
+        'options' => array(),
+        'parent_depth_limit' => 8,
       ),
+      // Adds default body text.
       'body' => array(
         'und' => array(
           '0' => array(
             'summary' => '',
-            'value' => '<h2>Address</h2><p>Coming Soon&nbsp;<br>The University&nbsp;<br>1800 Location Street<br>Cambridge, MA 02138</p>
-                        <p>Main Phone: xxx-xxx-xxxx&nbsp;<br>Main Fax: xxx-xxx-xxxx</p>',
-            'format' => 'filtered_html'
-          )
-        )
-      )
-    ));
+            'value' => $body,
+            'format' => 'filtered_html',
+          ),
+        ),
+      ),
+    );
+    $this->add_node($contact_page);
 
-    // Tear Down Enviroment.
+    // Tears down enviroment.
     $this->deactivate_vsite();
   }
 }
+
