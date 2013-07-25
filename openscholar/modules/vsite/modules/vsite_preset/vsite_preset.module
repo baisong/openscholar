@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Implements hook_og_tasks_info().
+ */
+function vsite_preset_og_tasks_info($entity_type, $entity) {
+  $tasks = array();
+
+  $tasks['AcademicsSection'] = new vsiteTaskAcademicsSection($entity_type, $entity);
+  $tasks['ResearchSection'] = new vsiteTaskResearchSection($entity_type, $entity);
+  $tasks['ResourcesSection'] = new vsiteTaskResourcesSection($entity_type, $entity);
+  $tasks['NewsEventsSection'] = new vsiteTaskNewsEventsSection($entity_type, $entity);
+  $tasks['AboutSection'] = new vsiteTaskAboutSection($entity_type, $entity);
+  $tasks['ContactPage'] = new vsiteTaskContactPage($entity_type, $entity);
+
+  return $tasks;
+}
+
