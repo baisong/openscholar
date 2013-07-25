@@ -2,13 +2,26 @@
 
 /**
  * @file
- * Vsite base class.
+ * Provides the vsite task base class which extends the class og_task.
+ */
+
+/**
+ * Class vsite_task
  */
 class vsite_task extends og_task {
   public $entity;
   public $entity_type;
+  protected $active_space;
 
-  protected $active_space; function __construct($entity_type, $entity, $title = NULL, $description = NULL) {
+  /**
+   * Constructor function.
+   *
+   * @param string $entity_type
+   * @param object $entity
+   * @param string $title
+   * @param string $description
+   */
+  function __construct($entity_type, $entity, $title = NULL, $description = NULL) {
 
     $this->entity = $entity;
     $this->entity_type = $entity_type;
@@ -34,12 +47,11 @@ class vsite_task extends og_task {
   }
 
   /**
-   * Add a post to the group {$this->entity}
-   *
+   * Adds a post to the group {$this->entity}
    *
    * @param array $node
    *
-   * @return boolean
+   * @return the node object, or FALSE if unable to create node.
    */
   protected function add_node($node) {
 
@@ -78,16 +90,19 @@ class vsite_task extends og_task {
       $defaults[OG_AUDIENCE_FIELD][LANGUAGE_NONE]['0'] = array('target_id' => $this->entity->nid);
     }
 
-    //Add in the defaults
+    // Merges default options with the given node and builds a stdClass.
     $node = (object) array_merge($defaults, $node);
+    // Saves the node object (inserts the new node).
     node_save($node);
 
     return $node;
   }
 
   /**
-   * Setup the active space so that drupal functions that look at the active space will work correctly.
-   * This should be run before any complicated vsite CRUD funcitons.
+   * Sets the correct active space.
+   *
+   * This should be run before any complicated vsite CRUD functions, since
+   * otherwise Drupal API functions that look at the active space may fail.
    */
   protected function activate_vsite() {
     // Activate the current space.
@@ -100,7 +115,9 @@ class vsite_task extends og_task {
   }
 
   /**
-   * Restore the previous active space
+   * Restores the previous active space.
+   *
+   * This should be called at the end of any task that uses activate_vsite().
    */
   protected function deactivate_vsite() {
     // Tear down this task.
