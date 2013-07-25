@@ -26,7 +26,7 @@ function vsite_preset_spaces_preset() {
   $preset->disabled = FALSE; /* Edit this to true to make a default spaces_presets disabled initially */
   $preset->api_version = 3;
   $preset->name = 'os_department';
-  $preset->title = 'Academic Department';
+  $preset->title = 'OS Department - Academic';
   $preset->description = '';
   $preset->space_type = 'og';
   $preset->value = array(
@@ -197,7 +197,7 @@ function vsite_preset_spaces_preset() {
 
   // Translatables
   // Included for use with string extractors like potx.
-  t('Academic Department');
+  t('OS Department - Academic');
   $export['os_department'] = $preset;
 
   return $export;
