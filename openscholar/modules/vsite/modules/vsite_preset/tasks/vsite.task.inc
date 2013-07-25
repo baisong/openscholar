@@ -4,14 +4,11 @@
  * @file
  * Vsite base class.
  */
-
 class vsite_task extends og_task {
   public $entity;
   public $entity_type;
 
-  protected $active_space;
-
-  function __construct($entity_type, $entity, $title = NULL, $description = NULL) {
+  protected $active_space; function __construct($entity_type, $entity, $title = NULL, $description = NULL) {
 
     $this->entity = $entity;
     $this->entity_type = $entity_type;
@@ -29,7 +26,7 @@ class vsite_task extends og_task {
       return;
     }
 
-    $preset = spaces_preset_load($entity->spaces_preset_og,'og');
+    $preset = spaces_preset_load($entity->spaces_preset_og, 'og');
     if ($preset && isset($preset->value['og_tasks']) && in_array(get_class($this), $preset->value['og_tasks'])) {
       //The preset lists this task, set required to true
       $this->required = TRUE;
@@ -41,9 +38,10 @@ class vsite_task extends og_task {
    *
    *
    * @param array $node
+   *
    * @return boolean
    */
-  protected function add_node($node){
+  protected function add_node($node) {
 
     // Verify that the title and type of the node are specified.
     if (!isset($node['title'], $node['type'])) {
@@ -61,11 +59,11 @@ class vsite_task extends og_task {
       'comment' => 0,
       'path' => array(
         'language' => 'und',
-        'pathauto' => 1
+        'pathauto' => 1,
       ),
       'changed' => time(),
       'validated' => 1,
-      'os_menu'=> array(
+      'os_menu' => array(
         'enabled' => 0,
         'mlid' => 0,
         'module' => 'menu',
@@ -91,7 +89,7 @@ class vsite_task extends og_task {
    * Setup the active space so that drupal functions that look at the active space will work correctly.
    * This should be run before any complicated vsite CRUD funcitons.
    */
-  protected function activate_vsite(){
+  protected function activate_vsite() {
     // Activate the current space.
     if ($this->entity_type == 'node' && og_is_group_type($this->entity_type, $this->entity->type)) {
       $this->active_space = vsite_get_vsite();
@@ -104,10 +102,11 @@ class vsite_task extends og_task {
   /**
    * Restore the previous active space
    */
-  protected function deactivate_vsite(){
+  protected function deactivate_vsite() {
     // Tear down this task.
     if (!$this->active_space || $this->active_space != $this->entity->nid) {
       spaces_set_space($this->active_space);
     }
   }
 }
+
