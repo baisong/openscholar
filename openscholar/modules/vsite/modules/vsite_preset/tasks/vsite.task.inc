@@ -22,7 +22,6 @@ class vsite_task extends og_task {
    * @param string $description
    */
   function __construct($entity_type, $entity, $title = NULL, $description = NULL) {
-
     $this->entity = $entity;
     $this->entity_type = $entity_type;
 
@@ -44,58 +43,6 @@ class vsite_task extends og_task {
       //The preset lists this task, set required to true
       $this->required = TRUE;
     }
-  }
-
-  /**
-   * Adds a post to the group {$this->entity}
-   *
-   * @param array $node
-   *
-   * @return the node object, or FALSE if unable to create node.
-   */
-  protected function add_node($node) {
-
-    // Verify that the title and type of the node are specified.
-    if (!isset($node['title'], $node['type'])) {
-      return FALSE;
-    }
-
-    $defaults = array(
-      'uid' => $this->entity->uid,
-      'language' => 'und',
-      'status' => 1,
-      'promote' => 0,
-      'sticky' => 0,
-      'created' => time(),
-      'revision' => 0,
-      'comment' => 0,
-      'path' => array(
-        'language' => 'und',
-        'pathauto' => 1,
-      ),
-      'changed' => time(),
-      'validated' => 1,
-      'os_menu' => array(
-        'enabled' => 0,
-        'mlid' => 0,
-        'module' => 'menu',
-        'hidden' => 0,
-        'has_children' => 0,
-        'customized' => 0,
-        'options' => array(),
-      ),
-    );
-
-    if ($this->entity_type == 'node' && og_is_group_type($this->entity_type, $this->entity->type)) {
-      $defaults[OG_AUDIENCE_FIELD][LANGUAGE_NONE]['0'] = array('target_id' => $this->entity->nid);
-    }
-
-    // Merges default options with the given node and builds a stdClass.
-    $node = (object) array_merge($defaults, $node);
-    // Saves the node object (inserts the new node).
-    node_save($node);
-
-    return $node;
   }
 
   /**

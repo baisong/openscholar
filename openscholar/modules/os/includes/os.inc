@@ -8,7 +8,7 @@
  */
 
 /**
- * Returns avalible bundles, with option to filter by spaces_features status.
+ * Returns available bundles, with option to filter by spaces_features status.
  *
  * @param $privacy
  *  Can be array:
@@ -126,3 +126,67 @@ function os_get_app_path($app_name = NULL) {
   return ($apps) ? $apps : FALSE;
 }
 
+/**
+ * Creates a default node.
+ */
+function os_create_node($title, $uid = 0, $body = NULL, $options = array()) {
+  // Inserts the custom properies into the node options array.
+  $options['title'] = $title;
+  $options['uid'] = $uid;
+  $options['body'] = $body;
+
+  // Creates and loads the new node.
+  $node = os_save_node($options);
+
+  // Returns the new node.
+  return $node;
+}
+
+/**
+ * Creates and saves (inserts) a new node.
+ */
+function os_save_node($options) {
+  // Provides defaults which may be overridden in the $options param.
+  $now = time();
+  $language = LANGUAGE_NONE;
+  $defaults = array(
+    'uid' => 0,
+    'language' => $language,
+    'status' => 1,
+    'promote' => 0,
+    'sticky' => 0,
+    'created' => $now,
+    'revision' => 0,
+    'comment' => 0,
+    'path' => array(
+      'language' => $language,
+      'pathauto' => 1,
+    ),
+    'changed' => $now,
+    'validated' => 1,
+    'os_menu' => array(
+      'enabled' => 0,
+      'mlid' => 0,
+      'module' => 'menu',
+      'hidden' => 0,
+      'has_children' => 0,
+      'customized' => 0,
+      'options' => array(),
+    ),
+  );
+
+  // Merges default options with the given node and builds a stdClass.
+  $node = (object)array_merge($defaults, $options);
+
+  // Saves the node object (inserts the new node).
+  node_save($node);
+  if (!isset($node->nid)) {
+    return FALSE;
+  }
+
+  // Loads the newly-created node.
+  $node = node_load($node->nid);
+
+  // Returns the new node object.
+  return $node;
+}

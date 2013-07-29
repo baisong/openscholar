@@ -13,6 +13,11 @@ function vsite_preset_og_tasks_info($entity_type, $entity) {
   $tasks['AboutSection'] = new vsiteTaskAboutSection($entity_type, $entity);
   $tasks['ContactPage'] = new vsiteTaskContactPage($entity_type, $entity);
 
+  // @fixme determine best level of granularity
+  $title = t('News & Events');
+  $body = t('Coming soon!');
+  $weight = 99;
+  $tasks['NewsEventsSection'] = new vsite_add_section_task($entity_type, $entity, $title, $weight, $body);
   return $tasks;
 }
 
