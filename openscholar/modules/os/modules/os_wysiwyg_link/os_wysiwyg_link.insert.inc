@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Provides the insert link overlay including forms for each link URL type.
+ */
 function os_wysiwyg_link_insert() {
   module_invoke_all('suppress', TRUE);
   
@@ -124,6 +127,9 @@ function os_wysiwyg_link_insert() {
   return $output;
 }
 
+/**
+ * Form builder; provides form for "Web address" tab.
+ */
 function _os_link_external_form($form, $form_state, $params) {
   $form = array();
   $args = func_get_args();
@@ -147,6 +153,17 @@ function _os_link_external_form($form, $form_state, $params) {
   return $form;
 }
 
+/**
+ * Form submit callback; sanitizes relative paths.
+ */
+function _os_link_external_form_submit() {
+  // @todo prevent duplicate leading forward-slashes
+  // i.e. don't allow "//mypage" to be inserted; instead use "/mypage".
+}
+
+/**
+ * Form builder; provides form for "Page" tab.
+ */
 function _os_link_internal_form($form, $form_state, $params) {
   $form = array();
   
@@ -171,6 +188,9 @@ function _os_link_internal_form($form, $form_state, $params) {
   return $form;
 }
 
+/**
+ * Form builder; provides form for "Files" tab.
+ */
 function _os_link_get_view($params) {
   $name = 'media_default';
   $display = 'media_browser_1';
@@ -232,6 +252,9 @@ function _os_link_get_view($params) {
   return array();
 }
 
+/**
+ * Form builder; provides form for "E-mail" tab.
+ */
 function _os_link_email_form($form, $form_state, $params) {
   $form = array();
   
