@@ -1,0 +1,16 @@
+<?php
+
+/**
+ * @file
+ * Code for OS Virtual Site: Presets
+ */
+
+/**
+ * Implements hook_og_tasks_info().
+ */
+function vsite_preset_og_tasks_info($entity_type, $entity) {
+  $tasks = array();
+
+  // @todo determine how we want to use tasks.
+  return $tasks;
+}
