@@ -7,7 +7,9 @@ Drupal.behaviors.osLinkExternal = {
   attach: function (ctx) {
     $('#-os-link-external-form').submit(function (e) {
       if ($(this).filter(':visible').length > 0) {
-        Drupal.settings.osWysiwygLinkResult = $('#edit-external', this).val();
+        var value = $('#edit-external', this).val()
+        // Trims the leading slash from the raw input value.
+        Drupal.settings.osWysiwygLinkResult = value.replace(/\/$/, "");;
         Drupal.settings.osWysiwygLinkAttributes = {'data-url': $('#edit-external', this).val()};
         e.preventDefault();
       }

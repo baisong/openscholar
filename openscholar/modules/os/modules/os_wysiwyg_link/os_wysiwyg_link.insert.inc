@@ -154,14 +154,6 @@ function _os_link_external_form($form, $form_state, $params) {
 }
 
 /**
- * Form submit callback; sanitizes relative paths.
- */
-function _os_link_external_form_submit() {
-  // @todo prevent duplicate leading forward-slashes
-  // i.e. don't allow "//mypage" to be inserted; instead use "/mypage".
-}
-
-/**
  * Form builder; provides form for "Page" tab.
  */
 function _os_link_internal_form($form, $form_state, $params) {
