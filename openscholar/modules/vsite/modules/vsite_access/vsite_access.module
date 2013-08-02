@@ -303,7 +303,24 @@ function vsite_access_update_robots($group, $privacy) {
   $gid = $group->nid;
   $vsite = vsite_get_vsite($gid);
   $purl = $vsite->group->purl;
-
+  // Prevents a directive from being added with an empty purl value.
+  if (empty($purl)) {
+    // Attempts to find a purl value for this vsite from the purl table...
+    $result = db_query('SELECT p.value FROM {purl} p WHERE p.id = :gid AND p.provider="spaces_og"', array(':gid' => $gid));
+    foreach ($result as $record) {
+      if (isset($record->value)) {
+        $purl = $record->value;
+      }
+      // Logs a warning and exits before making changes if no purl value found.
+      if (empty($purl)) {
+        $message = 'No purl found when updating robots txt for vsite @title (Node ID @gid)';
+        $variables = array('@title' => $vsite->group->title, '@gid' => $gid);
+        $severity = WATCHDOG_WARNING;
+        watchdog('vsite_access', $message, $variables, $severity);
+        return;
+      }
+    }
+  }
   // The variable $directives is an array keyed by domain name,
   // with one array key for the purl base domain,
   // and an additional key for each vsite custom domain.
